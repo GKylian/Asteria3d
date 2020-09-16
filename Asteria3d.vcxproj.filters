@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Problems">
+      <UniqueIdentifier>{e8abbca9-d348-4c0e-bbb1-9e39963c56e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gas">
+      <UniqueIdentifier>{0fbca3be-dd7f-492d-9f20-8b432c6f331b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="misc">
+      <UniqueIdentifier>{f7f53382-9fc8-483d-8ffd-dcecde8ab282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="export">
+      <UniqueIdentifier>{a1ae8d3a-6f11-43be-a738-90d2eb4d5373}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reconstruction">
+      <UniqueIdentifier>{b46ec9c7-f55d-4af8-ae19-6fe9042efb93}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Asteria3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Definitions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="otvortex.h">
+      <Filter>Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="AdiabMHD.h">
+      <Filter>Gas</Filter>
+    </ClInclude>
+    <ClInclude Include="AdiabHD.h">
+      <Filter>Gas</Filter>
+    </ClInclude>
+    <ClInclude Include="IsoMHD.h">
+      <Filter>Gas</Filter>
+    </ClInclude>
+    <ClInclude Include="phymaths.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Arrays.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="primBounds.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="consBounds.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="vtk.h">
+      <Filter>export</Filter>
+    </ClInclude>
+    <ClInclude Include="plm.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
