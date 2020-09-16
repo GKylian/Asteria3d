@@ -28,10 +28,16 @@
     <Filter Include="Reconstruction">
       <UniqueIdentifier>{b46ec9c7-f55d-4af8-ae19-6fe9042efb93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="old">
+      <UniqueIdentifier>{7600d1d8-0004-4050-a4e7-5b17379d5441}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Asteria3d.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="old\2dMHD.cpp">
+      <Filter>old</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +72,36 @@
       <Filter>export</Filter>
     </ClInclude>
     <ClInclude Include="plm.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="old\Arrays.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="old\Eigenvalues.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\InitCond.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\InOut.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\MHD.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\phymaths.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\Reconstruction.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\Riemann.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="old\Waves.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="eigen.h">
       <Filter>Reconstruction</Filter>
     </ClInclude>
   </ItemGroup>
