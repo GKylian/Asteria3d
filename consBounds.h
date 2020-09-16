@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Definitions.h"
+#include "Defs/Definitions.h"
 
 /*
 <-------------------- Functions -------------------->
@@ -22,13 +22,13 @@ bool bounds_xin(Arrays *u);
 bool bounds_xout(Arrays *u);
 
 
-enum bounds
-{
-	PERIODIC,
-	OUTFLOW,
-	REFLECTING,
-	PRESSURE    /* For RT instability, extrapolate pressure with grav. potential to ghost cells to improve conservation of energy */
-};
+//enum bounds
+//{
+//	PERIODIC,
+//	OUTFLOW,
+//	REFLECTING,
+//	PRESSURE    /* For RT instability, extrapolate pressure with grav. potential to ghost cells to improve conservation of energy */
+//};
 
 bool allBounds(Arrays *u) {
 

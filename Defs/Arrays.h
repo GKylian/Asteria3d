@@ -76,6 +76,11 @@ struct Arrays
 	Array<long double> prim[NVAL];
 	//tex: $\vec{v} \to \vec{M}, E \to P$, and $\vec{B}$ are stored at cell centers
 
+	//The three interface arrays
+	Array<long double> intx[NVAL];
+	Array<long double> inty[NVAL];
+	Array<long double> intz[NVAL];
+
 	
 	
 	int Nx, Ny, Nz = 0;

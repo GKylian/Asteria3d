@@ -1,0 +1,28 @@
+#!/bin/bash
+
+echo ""
+read -p 'Launching Asteria. Are you sure ? [y/n]: ' iso
+
+if [ $iso != "y" ]; then
+    echo "Aborting the launch..."
+fi
+
+filename=Asteria
+if test -f "$filename"; then
+    echo ""
+    echo "Launching Asteria..."
+else
+    echo ""
+    echo "ERROR: The Asteria executable doesn't exist. Did you set up and compile Asteria using the  setup  bash script ?"
+    exit 1
+fi
+
+echo ""
+echo ""
+echo ""
+echo ""
+
+./Asteria
+
+echo ""
+echo "Asteria finished"

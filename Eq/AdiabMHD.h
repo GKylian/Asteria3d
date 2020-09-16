@@ -1,6 +1,6 @@
 #pragma once
-#include "Arrays.h"
-#include "phymaths.h"
+#include "../Defs/Arrays.h"
+#include "../Defs/phymaths.h"
 
 
 /*

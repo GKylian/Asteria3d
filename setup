@@ -1,0 +1,116 @@
+#!/bin/bash
+
+echo Deleting the previous problem file
+rm "prob.h"
+
+echo ""
+#read -p 'Enter the problem file local directory (e.g. probs/otvortex.h): ' filename
+filename=probs/otvortex.h
+
+if test -f "$filename"; then
+    echo "Problem file $filename exists, creating copy prob.h for the code"
+    cp "$filename" "prob.h"
+else
+    echo "The file $filename does not exist"
+    exit 1
+fi
+
+
+
+
+echo ""
+read -p 'Use an adiabatic equation of state (if not then isothermal) ? [y/n]: ' iso
+
+if [ $iso == "y" ]; then
+    echo "Configuring with an ADIABATIC equation of state"
+    echo "" > Config.h
+elif [ $mhd == "n" ]; then
+    echo "Configuring with an ISOTHERMAL equation of state"
+    echo "#define ISO" > Config.h
+else
+    echo "Invalid input, configuring with an ADIABATIC equation of state by default"
+    echo "" > Config.h
+fi
+
+
+
+echo ""
+read -p 'Use MHD ? [y/n]: ' mhd
+
+if [ $mhd == "y" ]; then
+    echo "Configuring with MHD"
+    echo "#define MHD" >> Config.h
+elif [ $mhd == "n" ]; then
+    echo "Configuring with HD"
+    echo "" >> Config.h
+else
+    echo "Invalid input, configuring with MHD by default"
+    echo "#define MHD" >> Config.h
+fi
+
+
+
+echo ""
+read -p 'Use HLLE, HLLC or HLLD ? [HLLE/HLLC/HLLD]: ' riem
+
+if [ $riem == "HLLE" ]; then
+    echo "Configuring with the HLLE Riemann Solver"
+    echo "#define HLLE" >> Config.h
+elif [ $riem == "HLLC" ]; then
+    echo "Configuring with the HLLC Riemann Solver"
+    echo "#define HLLC" >> Config.h
+elif [ $riem == "HLLD" ]; then
+    echo "Configuring with the HLLD Riemann Solver"
+    echo "#define HLLD" >> Config.h
+    if [ $mhd == "n" ]; then
+        echo "WARNING: Chose HLLD with HD, HLLC would give the same results, but faster"
+    fi
+else
+    echo "Invalid input, configuring with the HLLD Riemann Solver by default"
+    echo "#define HLLC" >> Config.h
+fi
+
+
+
+
+echo ""
+read -p "Apply the monotonicity constraints to characteristic variables (recommended) ? [y/n]: " charact
+
+if [ $charact == "y" ]; then
+    echo "Configuring with monotonicity constraints on CHARACTERISTIC variables"
+    echo "#define CHAR" >> Config.h
+elif [ $charact == "n" ]; then
+    echo "Configuring with monotonicity constraints on PRIMITIVE variables"
+    echo "" >> Config.h
+else
+    echo "Invalid input, configuring with monotonicity constraints on CHARACTERISTIC variables by default"
+    echo "#define CHAR" >> Config.h
+fi
+
+
+if [ $charact != "n" ]; then
+echo ""
+read -p "Do the characteristic tracing in PLM (recommended) ? [y/n]: " tracing
+
+if [ $tracing == "y" ]; then
+    echo "Configuring WITH characteristic tracing in PLM reconstruction"
+    echo "#define TRACING" >> Config.h
+elif [ $tracing == "n" ]; then
+    echo "Configuring WITHOUT characteristic tracing in PLM reconstruction"
+    echo "" >> Config.h
+else
+    echo "Invalid input, configuring with monotonicity constraints on CHARACTERISTIC variables by default"
+    echo "#define TRACING" >> Config.h
+fi
+
+else
+    echo "Chose PRIMITIVE, so the characteristic tracing cannot be applied"
+fi
+
+echo ""
+echo "Configuration complete. Now compiling..."
+g++ -w -o Asteria Asteria3d.cpp
+
+echo ""
+echo "Compilation complete. You can launch Asteria by executing the launch  bash script."
+echo ""

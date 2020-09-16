@@ -154,11 +154,15 @@
     <ClCompile Include="old\2dMHD.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AdiabHD.h" />
-    <ClInclude Include="AdiabMHD.h" />
-    <ClInclude Include="Arrays.h" />
     <ClInclude Include="consBounds.h" />
-    <ClInclude Include="eigen.h" />
+    <ClInclude Include="Defs\Arrays.h" />
+    <ClInclude Include="Defs\Definitions.h" />
+    <ClInclude Include="Defs\phymaths.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="Eq\AdiabHD.h" />
+    <ClInclude Include="Eq\AdiabMHD.h" />
+    <ClInclude Include="Eq\IsoMHD.h" />
+    <ClInclude Include="Export\vtk.h" />
     <ClInclude Include="old\Arrays.h" />
     <ClInclude Include="old\Eigenvalues.h" />
     <ClInclude Include="old\InitCond.h" />
@@ -168,13 +172,11 @@
     <ClInclude Include="old\Reconstruction.h" />
     <ClInclude Include="old\Riemann.h" />
     <ClInclude Include="old\Waves.h" />
-    <ClInclude Include="plm.h" />
     <ClInclude Include="primBounds.h" />
-    <ClInclude Include="Definitions.h" />
-    <ClInclude Include="IsoMHD.h" />
-    <ClInclude Include="otvortex.h" />
-    <ClInclude Include="phymaths.h" />
-    <ClInclude Include="vtk.h" />
+    <ClInclude Include="prob.h" />
+    <ClInclude Include="probs\otvortex.h" />
+    <ClInclude Include="Reconstruction\eigen.h" />
+    <ClInclude Include="Reconstruction\plm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

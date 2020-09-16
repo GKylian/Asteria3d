@@ -13,23 +13,23 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Problems">
-      <UniqueIdentifier>{e8abbca9-d348-4c0e-bbb1-9e39963c56e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Gas">
-      <UniqueIdentifier>{0fbca3be-dd7f-492d-9f20-8b432c6f331b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="misc">
-      <UniqueIdentifier>{f7f53382-9fc8-483d-8ffd-dcecde8ab282}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="export">
-      <UniqueIdentifier>{a1ae8d3a-6f11-43be-a738-90d2eb4d5373}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Reconstruction">
       <UniqueIdentifier>{b46ec9c7-f55d-4af8-ae19-6fe9042efb93}</UniqueIdentifier>
     </Filter>
     <Filter Include="old">
       <UniqueIdentifier>{7600d1d8-0004-4050-a4e7-5b17379d5441}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Eq">
+      <UniqueIdentifier>{0fbca3be-dd7f-492d-9f20-8b432c6f331b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Defs">
+      <UniqueIdentifier>{f7f53382-9fc8-483d-8ffd-dcecde8ab282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Export">
+      <UniqueIdentifier>{a1ae8d3a-6f11-43be-a738-90d2eb4d5373}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Probs">
+      <UniqueIdentifier>{e8abbca9-d348-4c0e-bbb1-9e39963c56e7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -41,42 +41,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Definitions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="otvortex.h">
-      <Filter>Problems</Filter>
-    </ClInclude>
-    <ClInclude Include="AdiabMHD.h">
-      <Filter>Gas</Filter>
-    </ClInclude>
-    <ClInclude Include="AdiabHD.h">
-      <Filter>Gas</Filter>
-    </ClInclude>
-    <ClInclude Include="IsoMHD.h">
-      <Filter>Gas</Filter>
-    </ClInclude>
-    <ClInclude Include="phymaths.h">
-      <Filter>misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Arrays.h">
-      <Filter>misc</Filter>
-    </ClInclude>
-    <ClInclude Include="primBounds.h">
-      <Filter>misc</Filter>
-    </ClInclude>
-    <ClInclude Include="consBounds.h">
-      <Filter>misc</Filter>
-    </ClInclude>
-    <ClInclude Include="vtk.h">
-      <Filter>export</Filter>
-    </ClInclude>
-    <ClInclude Include="plm.h">
-      <Filter>Reconstruction</Filter>
-    </ClInclude>
-    <ClInclude Include="old\Arrays.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="old\Eigenvalues.h">
       <Filter>old</Filter>
     </ClInclude>
@@ -101,8 +65,50 @@
     <ClInclude Include="old\Waves.h">
       <Filter>old</Filter>
     </ClInclude>
-    <ClInclude Include="eigen.h">
+    <ClInclude Include="Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="probs\otvortex.h">
+      <Filter>Probs</Filter>
+    </ClInclude>
+    <ClInclude Include="old\Arrays.h">
+      <Filter>old</Filter>
+    </ClInclude>
+    <ClInclude Include="primBounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="consBounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prob.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Eq\AdiabHD.h">
+      <Filter>Eq</Filter>
+    </ClInclude>
+    <ClInclude Include="Eq\AdiabMHD.h">
+      <Filter>Eq</Filter>
+    </ClInclude>
+    <ClInclude Include="Eq\IsoMHD.h">
+      <Filter>Eq</Filter>
+    </ClInclude>
+    <ClInclude Include="Defs\Arrays.h">
+      <Filter>Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="Defs\Definitions.h">
+      <Filter>Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="Reconstruction\eigen.h">
       <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="Reconstruction\plm.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="Defs\phymaths.h">
+      <Filter>Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="Export\vtk.h">
+      <Filter>Export</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,10 +2,10 @@
 //
 
 #include <iostream>
-#include "Definitions.h"
-#include "Arrays.h"
-#include "otvortex.h"
-#include "vtk.h"
+#include "Defs/Definitions.h"
+#include "Defs/Arrays.h"
+#include "prob.h"
+#include "Export/vtk.h"
 
 #ifdef PRIMBOUNDS
   #include "primBounds.h"
@@ -13,7 +13,7 @@
   #include "consBounds.h"
 #endif // PRIMBOUNDS
 
-#include "Arrays.h"
+#include "Reconstruction/plm.h"
 
 
 Arrays u;
@@ -28,21 +28,6 @@ bool init(); bool Loop();
 int main()
 {
     std::cout << "Hello World!\n";
-
-    /*  Check that the definitions are good:  */
-#ifdef HLLD
-  #ifdef HLLC
-    #error Both the HLLD and HLLC solvers are defined !
-  #endif // HLLC
-  #ifndef MHD
-    #error Using the HLLD solver for hydrodynamics !
-  #endif // !MHD
-
-  #ifdef HLL
-    #error Both the HLLD and HLL solvers are defined !
-  #endif // HLL
-
-#endif // HLLD
 
 
     /*  Initialize the arrays and set initial conditions  */

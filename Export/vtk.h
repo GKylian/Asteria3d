@@ -4,7 +4,7 @@
 #include <fstream>
 using namespace std;
 
-#include "Arrays.h"
+#include "../Defs/Arrays.h"
 
 bool vtk_add(Arrays *u, bool ghosts, exports exp)
 {

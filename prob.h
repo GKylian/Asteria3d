@@ -1,15 +1,15 @@
 #pragma once
-#include "Definitions.h"
+#include "Defs/Definitions.h"
 
 #ifdef MHD
   #ifndef ISO
-    #include "AdiabMHD.h"
+    #include "Eq/AdiabMHD.h"
   #else
-    #include "IsoMHD.h"
+    #include "Eq/IsoMHD.h"
   #endif // !ISO
 #else
   #ifndef ISO
-    #include "AdiabHD.h"
+    #include "Eq/AdiabHD.h"
   #endif // !ISO
 #endif // MHD
 
