@@ -87,7 +87,7 @@ struct Arrays
 	long double dx, dy, dz = 0;
 	long double x0, xn, y0, yn, z0, zn = 0.0;
 	bounds boundaries[6]; /* xin, xout, yin, yout, zin, zout */
-	long double t; long double dt;
+	long double t; long double dt; 
 
 
 	//dl/dr: first/last cell of the whole domain	gl/gr: last/first ghost cell	cl/cr: first/last cell of the computation domain

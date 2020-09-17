@@ -67,7 +67,7 @@ bool toPrimitive(Arrays *u, int i, int j, int k, long double gamma) {
     return true;
 }
 
-/* Transform the (i, j, k) interface values from primitive to conserved variables (used at the end of the reconstruction) */
+/* Transform the (i, j, k) interface values from primitive to conserved variables (used at the end of the reconstruction) */ 
 bool toConserved(Arrays *u, int dim, int i, int j, int k, long double gamma) {
     if (dim == 0) {
         long double v2 = SQ(u->ix(1, i, j, k))+SQ(u->ix(2, i, j, k))+SQ(u->ix(3, i, j, k));
