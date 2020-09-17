@@ -40,9 +40,9 @@
 
 #define gx 0.0
 #define gy 0.0
-#define gz 0.0 
+#define gz 0.0
 
-#define Phi(x) 0.0
+#define Phi(x, y, z) 0.0
 
 /* 
 <-------------------- Functions -------------------->

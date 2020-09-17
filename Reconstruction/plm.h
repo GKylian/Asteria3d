@@ -313,8 +313,8 @@ bool PLM(Arrays *u, int i, int j, int k) {
     /* ----- 10. Add gravity source terms (static or potential) ----- */
     if (gx != 0.0 || gy != 0.0 || gz != 0.0) {
         u->ix(1, iR, j, k) += u->dt/2.0 *gx; u->ix(1, iL, j, k) += u->dt/2.0 *gx;
-        u->iy(1, i, jR, k) += u->dt/2.0 *gy; u->ix(1, iL, j, k) += u->dt/2.0 *gx;
-        u->iz(1, i, j, kR) += u->dt/2.0 *gz; u->ix(1, iL, j, k) += u->dt/2.0 *gx;
+        u->iy(1, i, jR, k) += u->dt/2.0 *gy; u->ix(1, i, jL, k) += u->dt/2.0 *gy;
+        u->iz(1, i, j, kR) += u->dt/2.0 *gz; u->ix(1, i, j, kL) += u->dt/2.0 *gz;
     }
     else {
 
