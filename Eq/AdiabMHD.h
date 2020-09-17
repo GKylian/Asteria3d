@@ -67,6 +67,47 @@ bool toPrimitive(Arrays *u, int i, int j, int k, long double gamma) {
     return true;
 }
 
+/* Transform the (i, j, k) interface values from primitive to conserved variables (used at the end of the reconstruction) */
+bool toConserved(Arrays *u, int dim, int i, int j, int k, long double gamma) {
+    if (dim == 0) {
+        long double v2 = SQ(u->ix(1, i, j, k))+SQ(u->ix(2, i, j, k))+SQ(u->ix(3, i, j, k));
+        long double B2 = SQ(u->ix(5, i, j, k))+SQ(u->ix(6, i, j, k))+SQ(u->ix(7, i, j, k));
+
+        long double rh = u->ix(0, i, j, k); u->ix(0, i, j, k) = rh;
+        u->ix(1, i, j, k) = rh*u->ix(1, i, j, k); u->ix(2, i, j, k) = rh*u->ix(2, i, j, k); u->ix(3, i, j, k) = rh*u->ix(3, i, j, k);
+
+        u->ix(4, i, j, k) = u->ix(4, i, j, k)/(gamma-1) + rh*v2/2.0 + B2/2.0;
+
+        if (isnan(u->ix(4, i, j, k))) return false;
+        return true;
+    }
+    if (dim == 1) {
+        long double v2 = SQ(u->iy(1, i, j, k))+SQ(u->iy(2, i, j, k))+SQ(u->iy(3, i, j, k));
+        long double B2 = SQ(u->iy(5, i, j, k))+SQ(u->iy(6, i, j, k))+SQ(u->iy(7, i, j, k));
+
+        long double rh = u->iy(0, i, j, k); u->iy(0, i, j, k) = rh;
+        u->iy(1, i, j, k) = rh*u->iy(1, i, j, k); u->iy(2, i, j, k) = rh*u->iy(2, i, j, k); u->iy(3, i, j, k) = rh*u->iy(3, i, j, k);
+
+        u->iy(4, i, j, k) = u->iy(4, i, j, k)/(gamma-1) + rh*v2/2.0 + B2/2.0;
+
+        if (isnan(u->iy(4, i, j, k))) return false;
+        return true;
+    }
+    if (dim == 2) {
+        long double v2 = SQ(u->iz(1, i, j, k))+SQ(u->iz(2, i, j, k))+SQ(u->iz(3, i, j, k));
+        long double B2 = SQ(u->iz(5, i, j, k))+SQ(u->iz(6, i, j, k))+SQ(u->iz(7, i, j, k));
+
+        long double rh = u->iz(0, i, j, k); u->iz(0, i, j, k) = rh;
+        u->iz(1, i, j, k) = rh*u->iz(1, i, j, k); u->iz(2, i, j, k) = rh*u->iz(2, i, j, k); u->iz(3, i, j, k) = rh*u->iz(3, i, j, k);
+
+        u->iz(4, i, j, k) = u->iz(4, i, j, k)/(gamma-1) + rh*v2/2.0 + B2/2.0;
+
+        if (isnan(u->iz(4, i, j, k))) return false;
+        return true;
+    }
+    
+}
+
 
 
 bool F(long double uP[8], long double uC[8], long double *flux) {

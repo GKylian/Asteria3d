@@ -4,8 +4,8 @@ echo Deleting the previous problem file
 rm "prob.h"
 
 echo ""
-#read -p 'Enter the problem file local directory (e.g. probs/otvortex.h): ' filename
-filename=probs/otvortex.h
+read -p 'Enter the problem file local directory (e.g. probs/otvortex.h): ' filename
+#filename=probs/otvortex.h
 
 if test -f "$filename"; then
     echo "Problem file $filename exists, creating copy prob.h for the code"

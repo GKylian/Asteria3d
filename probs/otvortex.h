@@ -38,6 +38,11 @@
   #define B0 0.282094792
 #endif // MHD
 
+#define gx 0.0
+#define gy 0.0
+#define gz 0.0
+
+#define Phi(x) 0.0
 
 /* 
 <-------------------- Functions -------------------->

@@ -87,6 +87,8 @@ struct Arrays
 	long double dx, dy, dz = 0;
 	long double x0, xn, y0, yn, z0, zn = 0.0;
 	bounds boundaries[6]; /* xin, xout, yin, yout, zin, zout */
+	long double t; long double dt;
+
 
 	//dl/dr: first/last cell of the whole domain	gl/gr: last/first ghost cell	cl/cr: first/last cell of the computation domain
 	int i_dl, i_gl, i_cl, i_dr, i_gr, i_cr;
@@ -98,8 +100,12 @@ struct Arrays
 		for (int i = 0; i < NVAL; i++)
 		{
 			//if (i == 5 || i == 6) continue;
-			cons[i].setSize(nx+NGHOST+(i==5), ny+NGHOST+(i==6), nz+NGHOST+(i==7));
-			prim[i].setSize(nx+NGHOST, ny+NGHOST, nz+NGHOST);
+			cons[i].setSize(nx+2*NGHOST+(i==5), ny+2*NGHOST+(i==6), nz+2*NGHOST+(i==7));
+			prim[i].setSize(nx+2*NGHOST, ny+2*NGHOST, nz+2*NGHOST);
+
+			intx[i].setSize(2*(nx+2*NGHOST), ny+2*NGHOST, nz+2*NGHOST);
+			inty[i].setSize(nx+2*NGHOST, 2*(ny+2*NGHOST), nz+2*NGHOST);
+			intz[i].setSize(nx+2*NGHOST, ny+2*NGHOST, 2*(nz+2*NGHOST));
 		}
 		setIndexes();
 	}
@@ -137,6 +143,15 @@ struct Arrays
 	}
 	Array<long double> &getP(int i) {
 		return prim[i];
+	}
+	long double &ix(int i, int xi, int yi, int zi) {
+		return intx[i].get(xi, yi, zi);
+	}
+	long double &iy(int i, int xi, int yi, int zi) {
+		return inty[i].get(xi, yi, zi);
+	}
+	long double &iz(int i, int xi, int yi, int zi) {
+		return intz[i].get(xi, yi, zi);
 	}
 
 	void setIndexes() {
