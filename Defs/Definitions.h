@@ -27,6 +27,8 @@
 #define CHAR
 */
 
+#define PRIMBOUNDS
+
 #ifdef MHD
   #define NGHOST 3
 #else
@@ -50,6 +52,9 @@
     #define NWAVE 5
   #endif // ISO
 #endif // MHD
+
+#define WV (NWAVE-1)/2
+
 
 enum class bounds
 {

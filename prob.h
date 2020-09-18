@@ -42,7 +42,15 @@
 #define gy 0.0
 #define gz 0.0
 
-#define Phi(x, y, z) 0.0
+long double Phi(long double x, long double y, long double z) {
+	return 0;
+}
+
+long double Phii(Arrays *u, int i, int j, int k) {
+	long double x[3] = { 0 }; 
+	u->pos(x, i, j, k);
+	return Phi(x[0], x[1], x[2]);
+}
 
 /* 
 <-------------------- Functions -------------------->

@@ -83,7 +83,7 @@ struct Arrays
 
 	
 	
-	int Nx, Ny, Nz = 0;
+	int Nx, Ny, Nz = 0; int dim = 0.0;
 	long double dx, dy, dz = 0;
 	long double x0, xn, y0, yn, z0, zn = 0.0;
 	bounds boundaries[6]; /* xin, xout, yin, yout, zin, zout */
@@ -108,6 +108,7 @@ struct Arrays
 			intz[i].setSize(nx+2*NGHOST, ny+2*NGHOST, 2*(nz+2*NGHOST));
 		}
 		setIndexes();
+		dim = (nx > 1)+(ny > 1)+(nz > 1);
 	}
 
 	void seth(long double _dx, long double _dy) {
@@ -152,6 +153,12 @@ struct Arrays
 	}
 	long double &iz(int i, int xi, int yi, int zi) {
 		return intz[i].get(xi, yi, zi);
+	}
+
+	void pos(long double *x, int i, int j, int k) {
+		x[0] = x0+(i-i_cl)*dx;
+		x[1] = y0+(j-j_cl)*dy;
+		x[2] = z0+(k-k_cl)*dz;
 	}
 
 	void setIndexes() {

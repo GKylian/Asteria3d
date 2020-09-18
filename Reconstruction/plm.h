@@ -11,7 +11,7 @@
 bool PLM(Arrays *u, int i, int j, int k) {
     int nx = u->Nx; int ny = u->Ny; int nz = u->Nz;
     int iR = 2*i; int iL = 2*i+1; int jR = 2*j; int jL = 2*j+1; int kR = 2*k; int kL = 2*k+1; //interface indices of the right (i-1/2) and left (i+1/2) interfaces (in the cell i, j, k)
-    
+    int iBx = NVAL-3; int iBy = NVAL-2; int iBz = NVAL-1;
 
     /* ----- 0. Initialize all the values, arrays and matrices ----- */
 
@@ -54,21 +54,21 @@ bool PLM(Arrays *u, int i, int j, int k) {
     /* Swap v and B to get the correct order */
     /* y: (vx, vy, vz) -> (vy, vx, vz)       z: (vx, vy, vz) -> (vz, vx, vy) */
     /* x: (Bx, By, Bz) -> (By, Bz, Bx)       y: (Bx, By, Bz) -> (Bx, Bz, By) */
-    swap( wi[NVAL-3],  wi[NVAL-1]); swap( wi[NVAL-3],  wi[NVAL-2]);
-    swap(wip[NVAL-3], wip[NVAL-1]); swap(wip[NVAL-3], wip[NVAL-2]);
-    swap(wim[NVAL-3], wim[NVAL-1]); swap(wim[NVAL-3], wim[NVAL-2]);
+    swap( wi[iBx],  wi[iBz]); swap( wi[iBx],  wi[iBy]);
+    swap(wip[iBx], wip[iBz]); swap(wip[iBx], wip[iBy]);
+    swap(wim[iBx], wim[iBz]); swap(wim[iBx], wim[iBy]);
 
     swap(wj[1], wj[2]);    swap(wjp[1], wjp[2]);    swap(wjm[1], wjm[2]);
-    swap(wj[NVAL-2], wj[NVAL-1]);    swap(wjp[NVAL-2], wjp[NVAL-1]);    swap(wjm[NVAL-2], wjm[NVAL-1]);
+    swap(wj[iBy], wj[iBz]);    swap(wjp[iBy], wjp[iBz]);    swap(wjm[iBy], wjm[iBz]);
 
     swap(wk[1], wk[3]); swap(wk[2], wk[3]);    swap(wkp[1], wkp[3]); swap(wkp[2], wkp[3]);    swap(wkm[1], wkm[3]); swap(wkm[2], wkm[3]);
     
 
 
     /* ----- 2. Compute and store the eigenvectors and eigenvalues, as well as the min/max eigenvalues ----- */
-    if (nx > 1) { if (!getEigen(wi, eigen_x, Lx, Rx)) std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'x' direction." << std::endl; }
-    if (ny > 1) { if (!getEigen(wj, eigen_y, Ly, Ry)) std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'y' direction." << std::endl; }
-    if (nz > 1) { if (!getEigen(wk, eigen_z, Lz, Rz)) std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'z' direction." << std::endl; }
+    if (nx > 1) { if (!getEigen(wi, eigen_x, Lx, Rx)) std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'x' direction." << std::endl; return false; }
+    if (ny > 1) { if (!getEigen(wj, eigen_y, Ly, Ry)) std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'y' direction." << std::endl; return false; }
+    if (nz > 1) { if (!getEigen(wk, eigen_z, Lz, Rz)) std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'z' direction." << std::endl; return false; }
 
     long double eigM_x = (long double)*max_element(eigen_x, eigen_x+NWAVE); long double eig0_x = (long double)*min_element(eigen_x, eigen_x+NWAVE);
     long double eigM_y = (long double)*max_element(eigen_y, eigen_y+NWAVE); long double eig0_y = (long double)*min_element(eigen_y, eigen_y+NWAVE);
@@ -279,15 +279,18 @@ bool PLM(Arrays *u, int i, int j, int k) {
     /* ----- 8.2 Switch back elements to normal order ----- */
     /* y: (vy, vx, vz) -> (vx, vy, vz)       z: (vz, vx, vy) -> (vx, vy, vz) */
     /* x: (By, Bz, Bx) -> (Bx, By, Bz)       y: (Bx, Bz, By) -> (Bx, By, Bz) */
-    swap(u->iy(1, i, jL, k), u->iy(2, i, jL, k)); swap(u->iy(1, i, jR, k), u->iy(2, i, jR, k));
-    swap(u->iz(1, i, j, kL), u->iz(2, i, j, kL)); swap(u->iz(1, i, j, kR), u->iz(2, i, j, kR)); swap(u->iz(2, i, j, kL), u->iz(3, i, j, kL)); swap(u->iz(2, i, j, kR), u->iz(3, i, j, kR));
+    swap(u->iy(1, i, jL, k), u->iy(2, i, jL, k));    swap(u->iy(1, i, jR, k), u->iy(2, i, jR, k));
+    swap(u->iz(1, i, j, kL), u->iz(2, i, j, kL)); swap(u->iz(1, i, j, kR), u->iz(2, i, j, kR));    swap(u->iz(2, i, j, kL), u->iz(3, i, j, kL)); swap(u->iz(2, i, j, kR), u->iz(3, i, j, kR));
+    
+    swap(u->ix(iBx, iL, j, k), u->ix(iBy, iL, j, k)); swap(u->ix(iBx, iL, j, k), u->ix(iBz, iL, j, k));    swap(u->ix(iBx, iR, j, k), u->ix(iBy, iR, j, k)); swap(u->ix(iBx, iR, j, k), u->ix(iBz, iR, j, k));
+    swap(u->iy(iBy, i, jL, k), u->iy(iBz, i, jL, k));    swap(u->iy(iBy, i, jR, k), u->iy(iBz, i, jR, k));
 
 
 
     /* ----- 9. Add magnetic field source terms ----- */
-    long double dBx = (u->uC(NVAL-3, i+1, j, k)-u->uC(NVAL-3, i, j, k))/u->dx;
-    long double dBy = (u->uC(NVAL-2, i, j+1, k)-u->uC(NVAL-2, i, j, k))/u->dy;
-    long double dBz = (u->uC(NVAL-1, i, j, k+1)-u->uC(NVAL-1, i, j, k))/u->dz;
+    long double dBx = (u->uC(iBx, i+1, j, k)-u->uC(iBx, i, j, k))/u->dx;
+    long double dBy = (u->uC(iBy, i, j+1, k)-u->uC(iBy, i, j, k))/u->dy;
+    long double dBz = (u->uC(iBz, i, j, k+1)-u->uC(iBz, i, j, k))/u->dz;
 
     long double dBy_x = -u->dt/2.0 * u->uP(2, i, j, k) * minmod(  (nz>1)*dBz, -(nx>1)*dBx  ); //Changed to By and Bz at the x interfaces
     long double dBz_x = -u->dt/2.0 * u->uP(3, i, j, k) * minmod(  (ny>1)*dBy, -(nx>1)*dBx  );
@@ -299,28 +302,49 @@ bool PLM(Arrays *u, int i, int j, int k) {
     long double dBy_z = -u->dt/2.0 * u->uP(2, i, j, k) * minmod(  (nx>1)*dBx, -(nz>1)*dBz  );
 
 
-    u->ix(NWAVE-2, iR, j, k) += dBy_x;  u->ix(NWAVE-2, iL, j, k) += dBy_x;
-    u->ix(NWAVE-1, iR, j, k) += dBz_x;  u->ix(NWAVE-1, iL, j, k) += dBz_x;
+    u->ix(iBy, iR, j, k) += dBy_x;  u->ix(iBy, iL, j, k) += dBy_x;
+    u->ix(iBz, iR, j, k) += dBz_x;  u->ix(iBz, iL, j, k) += dBz_x;
 
-    u->iy(NWAVE-1, i, jR, k) += dBz_y;  u->iy(NWAVE-1, i, jL, k) += dBz_y;
-    u->iy(NWAVE-3, i, jR, k) += dBx_y;  u->iy(NWAVE-3, i, jL, k) += dBx_y;
+    u->iy(iBz, i, jR, k) += dBz_y;  u->iy(iBz, i, jL, k) += dBz_y;
+    u->iy(iBx, i, jR, k) += dBx_y;  u->iy(iBx, i, jL, k) += dBx_y;
 
-    u->iz(NWAVE-3, i, j, kR) += dBx_z;  u->iz(NWAVE-3, i, j, kL) += dBx_z;
-    u->iz(NWAVE-2, i, j, kR) += dBy_z;  u->iz(NWAVE-2, i, j, kL) += dBy_z;
+    u->iz(iBx, i, j, kR) += dBx_z;  u->iz(iBx, i, j, kL) += dBx_z;
+    u->iz(iBy, i, j, kR) += dBy_z;  u->iz(iBy, i, j, kL) += dBy_z;
 
 
 
     /* ----- 10. Add gravity source terms (static or potential) ----- */
     if (gx != 0.0 || gy != 0.0 || gz != 0.0) {
         u->ix(1, iR, j, k) += u->dt/2.0 *gx; u->ix(1, iL, j, k) += u->dt/2.0 *gx;
-        u->iy(1, i, jR, k) += u->dt/2.0 *gy; u->ix(1, i, jL, k) += u->dt/2.0 *gy;
-        u->iz(1, i, j, kR) += u->dt/2.0 *gz; u->ix(1, i, j, kL) += u->dt/2.0 *gz;
+        u->iy(2, i, jR, k) += u->dt/2.0 *gy; u->iy(2, i, jL, k) += u->dt/2.0 *gy;
+        u->iz(3, i, j, kR) += u->dt/2.0 *gz; u->iz(3, i, j, kL) += u->dt/2.0 *gz;
     }
     else {
+        long double dpdx_p = (Phii(u, i+1, j, k)-Phii(u, i, j, k))/u->dx;   long double dpdx_m = (Phii(u, i, j, k)-Phii(u, i-1, j, k))/u->dx;
+        long double dpdy_p = (Phii(u, i, j+1, k)-Phii(u, i, j, k))/u->dy;   long double dpdy_m = (Phii(u, i, j, k)-Phii(u, i, j-1, k))/u->dy;
+        long double dpdz_p = (Phii(u, i, j, k+1)-Phii(u, i, j, k))/u->dz;   long double dpdz_m = (Phii(u, i, j, k)-Phii(u, i, j, k-1))/u->dz;
 
+        u->ix(1, iR, j, k) -= u->dt/2.0 *dpdx_m; u->ix(1, iL, j, k) -= u->dt/2.0 *dpdx_p;
+        u->iy(2, i, jR, k) -= u->dt/2.0 *dpdy_m; u->iy(2, i, jL, k) -= u->dt/2.0 *dpdy_p;
+        u->iz(3, i, j, kR) -= u->dt/2.0 *dpdz_m; u->iz(3, i, j, kL) -= u->dt/2.0 *dpdz_p;
     }
 
 
+    /* ----- 11. Set Bn at the n interface from the values in the uC arrays ----- */
+    u->ix(iBx, iR, j, k) = u->uC(iBx, i, j, k); u->ix(iBx, iL, j, k) = u->uC(iBx, i+1, j, k);
+    u->iy(iBy, i, jR, k) = u->uC(iBy, i, j, k); u->iy(iBy, i, jL, k) = u->uC(iBy, i, j+1, k);
+    u->iz(iBz, i, j, kR) = u->uC(iBz, i, j, k); u->iz(iBz, i, j, kL) = u->uC(iBz, i, j, k+1);
+
+
+    /* ----- 12. Transform the interface values to conserved variables ----- */
+    if (!toConserved(u, 0, iR, j, k, gamma)) std::cout << "ERROR:::plm.h::PLM:: Transformation of intx (R) to conserved variables failed !" << std::endl;
+    if (!toConserved(u, 0, iL, j, k, gamma)) std::cout << "ERROR:::plm.h::PLM:: Transformation of intx (R) to conserved variables failed !" << std::endl;
+    if (!toConserved(u, 1, i, jR, k, gamma)) std::cout << "ERROR:::plm.h::PLM:: Transformation of intx (R) to conserved variables failed !" << std::endl;
+    if (!toConserved(u, 1, i, jL, k, gamma)) std::cout << "ERROR:::plm.h::PLM:: Transformation of intx (R) to conserved variables failed !" << std::endl;
+    if (!toConserved(u, 2, i, j, kR, gamma)) std::cout << "ERROR:::plm.h::PLM:: Transformation of intx (R) to conserved variables failed !" << std::endl;
+    if (!toConserved(u, 2, i, j, kL, gamma)) std::cout << "ERROR:::plm.h::PLM:: Transformation of intx (R) to conserved variables failed !" << std::endl;
+    
+    return true;
 }
 
 #else

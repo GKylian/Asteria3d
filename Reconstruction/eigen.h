@@ -23,6 +23,13 @@ bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long d
     long double rh = w[0]; long double vn = w[1]; long double P = w[4]; long double rtrh = sqrtl(rh);
     long double B1 = w[5]; long double B2 = w[6]; long double Bn = w[7];
     long double b1 = B1/rtrh; long double b2 = B2/rtrh; long double bn = b1/rtrh;
+
+    if (rh <= 0) {
+        cout << "Density is null or negative: " << rh << endl; return false;
+    }
+    if (P <= 0) {
+        cout << "Pressure is null or negative: " << P << endl; return false;
+    }
     
 
     //1) Compute some reused values.

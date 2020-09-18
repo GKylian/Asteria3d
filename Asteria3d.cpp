@@ -22,7 +22,8 @@ Arrays _u;
 using namespace std;
 
 bool init(); bool Loop();
-
+long double getdt(long double CFL);
+long double cfl = 0.3;
 
 
 int main()
@@ -63,7 +64,7 @@ bool init() {
 
     /* Create the arrays */
     u.initAll(Nx, Ny, Nz); u.setRange(x0, xn, y0, yn, z0, zn); u.seth(dx, dy, dz);
-    
+    cout << "INIT:: Domain size: (" << u.Nx << ", " << u.Ny << ", " << u.Nz << ")." << endl;
 
     /* Initialize the arrays with the problem choosen */
     if (!Problem(&u)) {
@@ -80,9 +81,15 @@ bool init() {
 
     /* Temporary: exports the initial data */
     exports exp[2] = { exports::PRIM, exports::DIVB };
-    vtk_3d(&u, false, exp, 2);
+    //vtk_3d(&u, false, exp, 2);
 
-    DoInLoop(&u);
+    //DoInLoop(&u);
+
+
+    /* Compute the initial dt */
+    u.dt = getdt(cfl);
+    cout << "INIT:: Initial dt: " << u.dt << endl;
+
     return true;
 }
 
@@ -100,6 +107,61 @@ bool Loop() {
     --->   - When necessary, export data (.csv, .vtk, ...)
     --->   - Update t
     */
+    long double t0 = 0.0; long double tn = 0.1;
+    bool nx = u.Nx>1; bool ny = u.Ny>1; bool nz = u.Nz>1;
+
+    for (u.t = t0; u.t < tn; u.t+=u.dt) {
+        std::cout << "LOOP:: Computing at time " << u.t << "with time-step " << u.dt << endl;
+
+        /* ----- 1. Reconstruct interfaces from cell averages ----- */
+        for(int i = u.i_dl+1*nx; i <= u.i_dr-1*nx; i++)
+        for(int j = u.j_dl+1*ny; j <= u.j_dr-1*ny; j++)
+        for(int k = u.k_dl+1*nz; k <= u.k_dr-1*nz; k++)
+        {
+            cout << "Reconstructing at " << i << ", " << j << ", " << k << endl;
+            if(!PLM(&u, i, j, k)) return false;
+        }
+    }
+
 
     return true;
+}
+
+
+
+
+
+
+
+
+long double getdt(long double CFL) {
+    long double dt = 10000.0;
+
+    long double cx[WV] = { 0 }; long double cy[WV] = { 0 }; long double cz[WV] = { 0 };
+    long double dts[3] = { 0 };
+    long double Cx = 0.0, Cy = 0.0, Cz = 0.0;
+
+    /* Loop through the whole domain (including ghost cells) */
+    for(int i = u.i_dl; i <= u.i_dr; i++)
+    for(int j = u.j_dl; j <= u.j_dr; j++)
+    for(int k = u.k_dl; k <= u.k_dr; k++)
+    {
+        getWavespeeds(&u, i, j, k, gamma, cx, cy, cz);
+        Cx = *std::max_element(cx, cx+WV); Cy = *std::max_element(cy, cy+WV); Cz = *std::max_element(cz, cz+WV);
+
+        dts[0] = u.dx/(u.uP(1, i, j, k)+Cx); if (u.Nx<=1) dts[0] = 10000.0; if (isnan(dts[0])) dts[0] = 10000.0;
+        dts[1] = u.dy/(u.uP(2, i, j, k)+Cy); if (u.Ny<=1) dts[1] = 10000.0; if (isnan(dts[1])) dts[1] = 10000.0;
+        dts[2] = u.dz/(u.uP(3, i, j, k)+Cz); if (u.Nz<=1) dts[2] = 10000.0; if (isnan(dts[2])) dts[2] = 10000.0;
+        long double thdt = CFL * (*std::min_element(dts, dts+3));
+
+        if (thdt <= 0) {
+            thdt = 100.0;
+        }
+
+        dt = fminl(dt, thdt);
+
+    }
+
+    return dt;
+
 }

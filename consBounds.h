@@ -17,9 +17,9 @@
 	 <-> Apply the BC at the outer boundary of x (xn).
 <->
 */
-bool allBounds(Arrays *u);
-bool bounds_xin(Arrays *u);
-bool bounds_xout(Arrays *u);
+//bool allBounds(Arrays *u);
+//bool bounds_xin(Arrays *u);
+//bool bounds_xout(Arrays *u);
 
 
 //enum bounds
@@ -29,13 +29,14 @@ bool bounds_xout(Arrays *u);
 //	REFLECTING,
 //	PRESSURE    /* For RT instability, extrapolate pressure with grav. potential to ghost cells to improve conservation of energy */
 //};
-
-bool allBounds(Arrays *u) {
-
-
-	return true;
-}
-
-bool bounds_xin(Arrays *u) {
-
-}
+//
+//bool allBounds(Arrays *u) {
+//
+//
+//	return true;
+//}
+//
+//bool bounds_xin(Arrays *u) {
+//
+//	return true;
+//}

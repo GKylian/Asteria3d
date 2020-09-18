@@ -166,3 +166,32 @@ long double getDiv(Arrays *u, int i, int j, int k) {
     
     return (u->Nx>1)*(u->uC(5, i+1, j, k)-u->uC(5, i, j, k))/u->dx + (u->Ny>1)*(u->uC(6, i, j+1, k)-u->uC(6, i, j, k))/u->dy + (u->Nz>1)*(u->uC(7, i, j, k+1)-u->uC(7, i, j, k))/u->dz;
 }
+
+#ifndef ISO
+void getWavespeeds(Arrays *u, int i, int j, int k, long double gamma, long double *wvx, long double *wvy, long double *wvz) {
+    int iBx = NVAL-3; int iBy = NVAL-2; int iBz = NVAL-1;
+    long double v = sqrtl(SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k)));
+    long double B = sqrtl(SQ(u->uP(iBx, i, j, k))+SQ(u->uP(iBy, i, j, k))+SQ(u->uP(iBz, i, j, k)));
+
+    long double rh = u->uC(0, i, j, k);
+    long double a = sqrtl(gamma*u->uP(4, i, j, k)/rh);
+    long double CA = sqrtl(B*B/rh);
+
+    wvx[0] = a; wvx[2] = CA;
+    long double CAx = sqrtl(SQ(u->uP(iBx, i, j, k))/rh);
+    wvx[1] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAx*CAx)  );
+    wvx[3] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAx*CAx)  );
+
+    wvy[0] = a; wvy[2] = CA;
+    long double CAy = sqrtl(SQ(u->uP(iBy, i, j, k))/rh);
+    wvy[1] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAy*CAy)  );
+    wvy[3] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAy*CAy)  );
+
+    wvz[0] = a; wvz[2] = CA;
+    long double CAz = sqrtl(SQ(u->uP(iBz, i, j, k))/rh);
+    wvz[1] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAz*CAz)  );
+    wvz[3] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAz*CAz)  );
+
+}
+#endif // !ISO
+
