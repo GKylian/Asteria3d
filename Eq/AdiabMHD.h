@@ -43,7 +43,8 @@ bool BCenter(Arrays *u, int i, int j, int k) {
 bool toConserved(Arrays *u, int i, int j, int k, long double gamma) {
     long double v2 = SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k));
     long double B2 = SQ(u->uP(5, i, j, k))+SQ(u->uP(6, i, j, k))+SQ(u->uP(7, i, j, k));
-    
+
+    u->uC(5, i, j, k) = u->uP(5, i, j, k); u->uC(6, i, j, k) = u->uP(6, i, j, k); u->uC(7, i, j, k) = u->uP(7, i, j, k);
     long double rh = u->uP(0, i, j, k); u->uC(0, i, j, k) = rh;
     u->uC(1, i, j, k) = rh*u->uP(1, i, j, k); u->uC(2, i, j, k) = rh*u->uP(2, i, j, k); u->uC(3, i, j, k) = rh*u->uP(3, i, j, k);
     
@@ -53,10 +54,28 @@ bool toConserved(Arrays *u, int i, int j, int k, long double gamma) {
     return true;
 }
 
+bool toConserved(long double *w, long double *u, long double gamma) {
+    long double v2 = SQ(w[1])+SQ(w[2])+SQ(w[3]);
+    long double B2 = SQ(w[5])+SQ(w[6])+SQ(w[7]);
+
+    long double rh = w[0]; u[0] = rh;
+    u[1] = rh*w[1]; u[2] = rh*w[2]; u[3] = rh*u[3];
+    u[5] = w[5]; u[6] = w[6]; u[7] = w[7];
+
+    u[4] = w[4]/(gamma-1) + rh*v2/2.0 + B2/2.0;
+
+    if (isnan(u[4]) || null(u[4])) {
+        std::cout << "ERROR:::AdiabMHD.h::toConserved:: E is NaN or null/negative: " << u[4] << std::endl;
+        return false;
+    }
+
+}
+
 /*  uC to uP  */
 bool toPrimitive(Arrays *u, int i, int j, int k, long double gamma) {
     long double rh = u->uC(0, i, j, k); u->uP(0, i, j, k) = rh;
     u->uP(1, i, j, k) = u->uC(1, i, j, k)/rh; u->uP(2, i, j, k) = u->uC(2, i, j, k)/rh; u->uP(3, i, j, k) = u->uC(3, i, j, k)/rh;
+    u->uP(5, i, j, k) = u->uC(5, i, j, k); u->uP(6, i, j, k) = u->uC(6, i, j, k); u->uP(7, i, j, k) = u->uC(7, i, j, k);
 
     long double v2 = SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k));
     long double B2 = SQ(u->uP(5, i, j, k))+SQ(u->uP(6, i, j, k))+SQ(u->uP(7, i, j, k));
@@ -65,6 +84,31 @@ bool toPrimitive(Arrays *u, int i, int j, int k, long double gamma) {
 
     if (isnan(u->uP(4, i, j, k))) return false;
     return true;
+}
+
+bool toPrimitive(long double *u, long double *w, long double gamma) {
+    if (null(u[0])) {
+        std::cout << "ERROR:::AdiabMHD.h::toPrimitive:: the density is null !" << std::endl;
+        return false;
+    }
+    long double rh = u[0]; w[0] = rh;
+    w[1] = u[1]/rh; w[2] = u[2]/rh; w[3] = u[3]/rh;
+    w[5] = u[5]; w[6] = u[6]; w[7] = u[7];
+
+    long double v2 = SQ(w[1])+SQ(w[2])+SQ(w[3]);
+    long double B2 = SQ(w[5])+SQ(w[6])+SQ(w[7]);
+
+    w[4] = (u[4] - rh*v2/2.0 - B2/2.0)*(gamma-1);
+
+    if (isnan(w[4]) || null(w[4])) {
+        std::cout << "ERROR:::AdiabMHD.h::toPrimitive:: P is NaN or null/negative: " << w[4] << std::endl;
+        std::cout << "--> rho = " << rh << ", E: " << u[4] << ", v2: " << v2 << ", B2: " << B2 << std::endl;
+        
+        return false;
+    }
+
+    return true;
+
 }
 
 /* Transform the (i, j, k) interface values from primitive to conserved variables (used at the end of the reconstruction) */ 
@@ -119,7 +163,7 @@ bool F(long double uP[8], long double uC[8], long double *flux) {
     flux[1] = uC[1]*uP[1] + Pstar - uP[5]*uP[5];
     flux[2] = uC[1]*uP[2] - uP[5]*uP[6];
     flux[3] = uC[1]*uP[3] - uP[5]*uP[7];
-    flux[4] = (uP[4]+Pstar)*uP[1] - (uP[5]*uP[1]+uP[6]*uP[2]+uP[7]*uP[3])*uP[5];
+    flux[4] = (uC[4]+Pstar)*uP[1] - (uP[5]*uP[1]+uP[6]*uP[2]+uP[7]*uP[3])*uP[5];
     flux[5] = 0.0;
     flux[6] = uP[6]*uP[1] - uP[5]*uP[2];
     flux[7] = uP[7]*uP[1] - uP[5]*uP[3];
@@ -172,26 +216,91 @@ void getWavespeeds(Arrays *u, int i, int j, int k, long double gamma, long doubl
     int iBx = NVAL-3; int iBy = NVAL-2; int iBz = NVAL-1;
     long double v = sqrtl(SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k)));
     long double B = sqrtl(SQ(u->uP(iBx, i, j, k))+SQ(u->uP(iBy, i, j, k))+SQ(u->uP(iBz, i, j, k)));
+    
 
-    long double rh = u->uC(0, i, j, k);
+    long double rh = u->uC(0, i, j, k); if (rh <= 0) { cout << "ERROR:::AdiabMHD.h::getWavespeeds:: The density is null or negative !" << endl; return; }
     long double a = sqrtl(gamma*u->uP(4, i, j, k)/rh);
     long double CA = sqrtl(B*B/rh);
 
-    wvx[0] = a; wvx[2] = CA;
+    if (isnan(a)) {
+        cout << "ERROR:::AdiabMHD.h::getWavespeeds:: a is NaN" << endl;
+        cout << "d = " << rh << ", P = " << u->uP(4, i, j, k) << endl;
+        return;
+    }
+    
+
+    /*wvx[0] = a;*/ wvx[1] = CA;
     long double CAx = sqrtl(SQ(u->uP(iBx, i, j, k))/rh);
-    wvx[1] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAx*CAx)  );
-    wvx[3] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAx*CAx)  );
+    wvx[0] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAx*CAx)  );// if(isnan(wvx[0])) cout << "wvx[0] is NaN" << endl;
+    wvx[2] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAx*CAx)  );// if(isnan(wvx[2])) cout << "wvx[2] is NaN" << endl;
 
-    wvy[0] = a; wvy[2] = CA;
+    if (isnan(wvx[0])) {
+        cout << "ERROR:::AdiabMHD.h::getWavespeeds(u):: wvx[0] is NaN" << endl;
+        cout << "--> square: " << 0.5*((a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAx*CAx)) << endl;
+        cout << "--> a2 = " << a*a << ", CA2 = " << CA*CA << ", CAx2 = " << CAx*CAx << endl;
+        cout << "--> second square root: " << sqrtl(powl(a*a+CA*CA, 2) - 4*a*a*CAx*CAx) << endl;
+        cout << "--> sqrtl(sq(a2)) = " << sqrtl(SQ(a*a)) << ", should be equal to a2 = " << a*a << endl;
+        cout << "--> SQ(a2+CA2) = " << SQ(a*a+CA*CA) << " should be equal to a4 = " << SQ(a*a) << endl;
+        
+    }
+    if (isnan(wvx[2])) {
+        cout << "ERROR:::AdiabMHD.h::getWavespeeds(u):: wvx[2] is NaN" << endl;
+        cout << "--> square: " << 0.5*((a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAx*CAx)) << endl;
+        cout << "--> a2 = " << a*a << ", CA2 = " << CA*CA << ", CAx2 = " << CAx*CAx << endl;
+        cout << "--> second square root: " << sqrtl(powl(a*a+CA*CA, 2) - 4*a*a*CAx*CAx) << endl;
+        cout << "--> sqrtl(sq(a2)) = " << sqrtl(SQ(a*a)) << ", should be equal to a2 = " << a*a << endl;
+        cout << "--> SQ(a2+CA2) = " << SQ(a*a+CA*CA) << " should be equal to a4 = " << SQ(a*a) << endl;
+    }
+    
+    
+
+
+    /*wvy[0] = a;*/ wvy[1] = CA;
     long double CAy = sqrtl(SQ(u->uP(iBy, i, j, k))/rh);
-    wvy[1] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAy*CAy)  );
-    wvy[3] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAy*CAy)  );
+    wvy[0] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAy*CAy)  );
+    wvy[2] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAy*CAy)  );
 
-    wvz[0] = a; wvz[2] = CA;
+    /*wvz[0] = a;*/ wvz[1] = CA;
     long double CAz = sqrtl(SQ(u->uP(iBz, i, j, k))/rh);
-    wvz[1] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAz*CAz)  );
-    wvz[3] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAz*CAz)  );
+    wvz[0] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAz*CAz)  );
+    wvz[2] = sqrtl(0.5)*sqrtl(  (a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAz*CAz)  );
+
+}
+
+void getWavespeeds(long double *w, long double gamma, long double *wvn) {
+    int iBx = NVAL-3; int iBy = NVAL-2; int iBz = NVAL-1;
+    /* Order: (rho, vn, v1, v2, P, Bn, B1, B2) */
+    long double v = sqrtl(SQ(w[1])+SQ(w[2])+SQ(w[3]));
+    long double B = sqrtl(SQ(w[iBx])+SQ(w[iBy])+SQ(w[iBz]));
+
+
+    long double rh = w[0]; if (rh <= 0) { cout << "ERROR:::AdiabMHD.h::getWavespeeds:: The density is null or negative !" << endl; return; }
+    long double a = sqrtl(gamma*w[4]/rh);
+    long double CA = sqrtl(B*B/rh);
+
+
+    /*wvn[0] = a;*/ wvn[1] = CA; if (isnan(wvn[1])) cout << "wvn[1] is NaN" << endl;
+    long double CAn = sqrtl(SQ(w[5])/rh);
+    wvn[0] = sqrtl(0.5)*sqrtl((a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAn*CAn));
+    if (isnan(wvn[0])) {
+        cout << "ERROR:::AdiabMHD.h::getWavespeeds(w):: wvn[0] is NaN" << endl;
+        cout << "--> square: " << 0.5*((a*a+CA*CA) - sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAn*CAn)) << endl;
+        cout << "--> a2 = " << a*a << ", CA2 = " << CA*CA << ", CAn2 = " << CAn*CAn << endl;
+        cout << "--> second square root: " << sqrtl(powl(a*a+CA*CA,2) - 4*a*a*CAn*CAn) << endl;
+        cout << "--> sqrtl(sq(a2)) = " << sqrtl(SQ(a*a)) << ", should be equal to a2 = " << a*a << endl;
+        cout << "--> SQ(a2+CA2) = " << SQ(a*a+CA*CA) << " should be equal to a4 = " << SQ(a*a) << endl;
+    }
+    wvn[2] = sqrtl(0.5)*sqrtl((a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAn*CAn));
+    if (isnan(wvn[2])) {
+        cout << "ERROR:::AdiabMHD.h::getWavespeeds(w):: wvn[2] is NaN" << endl;
+        cout << "--> square: " << 0.5*((a*a+CA*CA) + sqrtl(SQ(a*a+CA*CA) - 4*a*a*CAn*CAn)) << endl;
+        cout << "--> a2 = " << a*a << ", CA2 = " << CA*CA << ", CAn2 = " << CAn*CAn << endl;
+        cout << "--> second square root: " << sqrtl(powl(a*a+CA*CA, 2) - 4*a*a*CAn*CAn) << endl;
+        cout << "--> sqrtl(sq(a2)) = " << sqrtl(SQ(a*a)) << ", should be equal to a2 = " << a*a << endl;
+        cout << "--> SQ(a2+CA2) = " << SQ(a*a+CA*CA) << " should be equal to a4 = " << SQ(a*a) << endl;
+    }
 
 }
 #endif // !ISO
+
 

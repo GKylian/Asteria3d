@@ -2,27 +2,30 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 using namespace std;
 
 #include "../Defs/Arrays.h"
 
-bool vtk_add(Arrays *u, bool ghosts, exports exp)
+bool vtk_add(Arrays *u, bool ghosts, exports out, string fname)
 {
 	
-	ofstream vtk("exports/out.vtk", ios::out | ios::app);
-	if (exp == exports::Bvec || exp == exports::Vvec || exp == exports::Mvec) {
+	ofstream vtk(fname, ios::out | ios::app);
+	if (out == exports::Bvec || out == exports::Vvec || out == exports::Mvec) {
 		/* Write header for  */
-		vtk << "VECTORS " << exp_names[(int)exp] << " float" << endl;
+		vtk << "VECTORS " << exp_names[(int)out] << " float" << endl;
 	}
 	else {
 		/* Write header for scalar */
-		vtk << "SCALARS " << exp_names[(int)exp] << " float" << endl;
+		vtk << "SCALARS " << exp_names[(int)out] << " float" << endl;
 		vtk << "LOOKUP_TABLE default" << endl;
 	}
 
 	/* Store the 'for' loops' limits to avoid computing them every iteration */
-	int imax = u->Nx+(!ghosts)*NGHOST; int jmax = u->Ny+(!ghosts)*NGHOST; int kmax = u->Nz+(!ghosts)*NGHOST;
-
+	//int imax = u->Nx+(!ghosts)*NGHOST; int jmax = u->Ny+(!ghosts)*NGHOST; int kmax = u->Nz+(!ghosts)*NGHOST;
+	int imin = ghosts*u->i_dl+(!ghosts)*u->i_cl; int imax = ghosts*u->i_dr+(!ghosts)*u->i_cr;
+	int jmin = ghosts*u->j_dl+(!ghosts)*u->j_cl; int jmax = ghosts*u->j_dr+(!ghosts)*u->j_cr;
+	int kmin = ghosts*u->k_dl+(!ghosts)*u->k_cl; int kmax = ghosts*u->k_dr+(!ghosts)*u->k_cr;
 
 
 
@@ -32,29 +35,29 @@ bool vtk_add(Arrays *u, bool ghosts, exports exp)
 
 	/* -------------------- VECTOR EXPORT -------------------- */
 
-	if (exp == exports::Bvec) {
+	if (out == exports::Bvec) {
 		/* Write the three components each line */
-		for(int k = (!ghosts)*NGHOST; k < kmax; k++)
-		for(int j = (!ghosts)*NGHOST; j < jmax; j++)
-		for(int i = (!ghosts)*NGHOST; i < imax; i++)
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
 		{
 			vtk << u->uP(5, i, j, k) << " " << u->uP(6, i, j, k) << " " << u->uP(7, i, j, k) << endl;
 		}
 	}
-	if (exp == exports::Vvec) {
+	if (out == exports::Vvec) {
 		/* Write the three components each line */
-		for(int k = (!ghosts)*NGHOST; k < kmax; k++)
-		for(int j = (!ghosts)*NGHOST; j < jmax; j++)
-		for(int i = (!ghosts)*NGHOST; i < imax; i++)
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
 		{
 			vtk << u->uP(1, i, j, k) << " " << u->uP(2, i, j, k) << " " << u->uP(3, i, j, k) << endl;
 		}
 	}
-	if (exp == exports::Mvec) {
+	if (out == exports::Mvec) {
 		/* Write the three components each line */
-		for(int k = (!ghosts)*NGHOST; k < kmax; k++)
-		for(int j = (!ghosts)*NGHOST; j < jmax; j++)
-		for(int i = (!ghosts)*NGHOST; i < imax; i++)
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
 		{
 			vtk << u->uC(1, i, j, k) << " " << u->uC(2, i, j, k) << " " << u->uC(3, i, j, k) << endl;
 		}
@@ -66,51 +69,51 @@ bool vtk_add(Arrays *u, bool ghosts, exports exp)
 
 	/* -------------------- SCALAR EXPORT -------------------- */
 
-	if (exp == exports::Rho) {
+	if (out == exports::Rho) {
 		/* Write the scalar each line */
-		for(int k = (!ghosts)*NGHOST; k < kmax; k++)
-		for(int j = (!ghosts)*NGHOST; j < jmax; j++)
-		for(int i = (!ghosts)*NGHOST; i < imax; i++)
+		for(int k = imin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = kmin; i <= imax; i++)
 		{
 			//cout << i << ", " << j << endl;
 			//cout << u->uC(0, i, j, k) << endl;
 			vtk << u->uC(0, i, j, k) << endl;
 		}
 	}
-	if (exp == exports::P) {
+	if (out == exports::P) {
 		/* Write the scalar each line */
-		for(int k = (!ghosts)*NGHOST; k < kmax; k++)
-		for(int j = (!ghosts)*NGHOST; j < jmax; j++)
-		for(int i = (!ghosts)*NGHOST; i < imax; i++)
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
 		{
 			vtk << u->uP(4, i, j, k) << endl;
 		}
 	}
-	if (exp == exports::E) {
+	if (out == exports::E) {
 		/* Write the scalar each line */
-		for(int k = (!ghosts)*NGHOST; k < kmax; k++)
-		for(int j = (!ghosts)*NGHOST; j < jmax; j++)
-		for(int i = (!ghosts)*NGHOST; i < imax; i++)
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
 		{
 			vtk << u->uC(4, i, j, k) << endl;
 		}
 	}
+#ifdef MHD
 	long double maxDiv = 0.0;
-	if (exp == exports::DIVB) {
+	if (out == exports::DIVB) {
 		/* Write the scalar each line */
-		for(int k = (!ghosts)*NGHOST; k < kmax; k++)
-		for(int j = (!ghosts)*NGHOST; j < jmax; j++)
-		for(int i = (!ghosts)*NGHOST; i < imax; i++)
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
 		{
 			long double DivB = getDiv(u, i, j, k);
-			if(fabsl(DivB) > 1e-12) cout << i << ", " << j << ", " << k << ": " << DivB << endl;
 			vtk << DivB << endl;
 			if (fabsl(DivB)>fabsl(maxDiv))
 				maxDiv = DivB;
 		}
 		cout << "Maximum divergence: " << maxDiv << endl;
 	}
-	
+#endif
 
 
 
@@ -118,61 +121,59 @@ bool vtk_add(Arrays *u, bool ghosts, exports exp)
 	return true;
 }
 
-bool vtk_3d(Arrays *u, bool ghosts, exports *exp, int Nexp)
+bool vtk_3d(Arrays *u, vector<Export> out)
 {
 
-	int Nx = u->Nx+ghosts*2*NGHOST*(u->Nx>1); int Ny = u->Ny+ghosts*2*NGHOST*(u->Ny>1); int Nz = u->Nz+ghosts*2*NGHOST*(u->Nz>1);
-
-	ofstream vtk("exports/out.vtk", ios::out | ios::trunc);
-
-	/* Headers of the .vtk file */
-	vtk << "# vtk DataFile Version 2.0" << endl;
-	vtk << "testing" << endl;
-	vtk << "ASCII" << endl << endl;
-
-	vtk << "DATASET STRUCTURED_POINTS" << endl;
-	vtk << "DIMENSIONS " << Nx << " " << Ny << " " << Nz << endl;
-	vtk << "ORIGIN " << u->x0-ghosts*NGHOST*u->dx*(u->Nx>1) << " " << u->y0-ghosts*NGHOST*u->dy*(u->Ny>1) << " " << u->z0-ghosts*NGHOST*u->dz*(u->Nz>1) << endl;
-	vtk << "SPACING " << u->dx << " " << u->dy << " " << u->dz << endl << endl;
-
-	vtk << "POINT_DATA " << Nx*Ny*Nz << endl;
-	vtk.close();
-
-
 	
-	for (int e = 0; e < Nexp; e++)
-	{
-		exports expi = exp[e];
-		if (expi == exports::CONS) {
+	for (Export E : out) {
+		if (E.type != 0) continue; /* if not vtk */
+		string fname = "exports/"+E.name+"_"+to_string(u->s)+".vtk";
+		cout << "EXPORT:: Exporting to vtk file " << fname << endl;
+		ofstream vtk(fname, ios::out | ios::trunc);
 
-			vtk_add(u, ghosts, exports::Rho);
-			vtk_add(u, ghosts, exports::Mvec);
-			vtk_add(u, ghosts, exports::E);
+		int Nx = u->Nx+E.ghosts*2*NGHOST*(u->Nx>1); int Ny = u->Ny+E.ghosts*2*NGHOST*(u->Ny>1); int Nz = u->Nz+E.ghosts*2*NGHOST*(u->Nz>1);
+
+		/* Headers of the .vtk file */
+		vtk << "# vtk DataFile Version 2.0" << endl;
+		vtk << "testing" << endl;
+		vtk << "ASCII" << endl << endl;
+
+		vtk << "DATASET STRUCTURED_POINTS" << endl;
+		vtk << "DIMENSIONS " << Nx << " " << Ny << " " << Nz << endl;
+		vtk << "ORIGIN " << u->x0-E.ghosts*NGHOST*u->dx*(u->Nx>1) << " " << u->y0-E.ghosts*NGHOST*u->dy*(u->Ny>1) << " " << u->z0-E.ghosts*NGHOST*u->dz*(u->Nz>1) << endl;
+		vtk << "SPACING " << u->dx << " " << u->dy << " " << u->dz << endl << endl;
+
+		vtk << "POINT_DATA " << Nx*Ny*Nz << endl;
+		vtk.close();
+
+		for (exports e : E.exp) {
+
+			if (e == exports::CONS) {
+
+				vtk_add(u, E.ghosts, exports::Rho, fname);
+				vtk_add(u, E.ghosts, exports::Mvec, fname);
+				vtk_add(u, E.ghosts, exports::E, fname);
 #ifdef MHD
-			vtk_add(u, ghosts, exports::Bvec);
+				vtk_add(u, E.ghosts, exports::Bvec, fname);
 #endif // MHD
 
-		}
-		else if (expi == exports::PRIM) {
+			}
+			else if (e == exports::PRIM) {
 
-			vtk_add(u, ghosts, exports::Rho);
-			vtk_add(u, ghosts, exports::Vvec);
-			vtk_add(u, ghosts, exports::P);
+				vtk_add(u, E.ghosts, exports::Rho, fname);
+				vtk_add(u, E.ghosts, exports::Vvec, fname);
+				vtk_add(u, E.ghosts, exports::P, fname);
 #ifdef MHD
-			vtk_add(u, ghosts, exports::Bvec);
+				vtk_add(u, E.ghosts, exports::Bvec, fname);
 #endif // MHD
 
-		}
-		else {
-			vtk_add(u, ghosts, expi);
+			}
+			else {
+				vtk_add(u, E.ghosts, e, fname);
+			}
 		}
 	}
 
 	
-
-
-
-
-	vtk.close();
 	return true;
 }

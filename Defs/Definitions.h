@@ -3,6 +3,7 @@
 #include <math.h>
 #include <iostream>
 #include "../Config.h"
+#include <vector>
 
 /* Defines all the parameters set pre-compiling
 <->
@@ -24,7 +25,7 @@
 #define HLLC				 Use the HLLC Riemann Solver ? 
 #define HLLE				 Use the HLLE Riemann Solver ? 
 #define TRACING				 Do the characteristic tracing ?
-#define CHAR
+#define CHAR                 Monotonicity constraints in characteristic variables ?
 */
 
 #define PRIMBOUNDS
@@ -55,6 +56,7 @@
 
 #define WV (NWAVE-1)/2
 
+//#define CT
 
 enum class bounds
 {
@@ -105,4 +107,22 @@ std::string exp_names[18] = {
     "By",
     "Bz",
     "B_Divergence"
+};
+
+struct Export
+{
+    int type = 0; /*0: vtk    1: csv */
+    std::vector<exports> exp;   /* What variables to export ?*/
+
+    int xType;  /* 0: export the whole dimension    1: average across the whole dimension    2: take slice at n-th cell*/
+    int xSlice = 0; /* Slice at xSlice-th cell */
+    int yType;
+    int ySlice = 0;
+    int zType;
+    int zSlice = 0;
+
+    bool ghosts = false;
+
+    std::string name = "output";
+    
 };

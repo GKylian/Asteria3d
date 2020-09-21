@@ -109,7 +109,7 @@ fi
 
 echo ""
 echo "Configuration complete. Now compiling..."
-g++ -w -o Asteria Asteria3d.cpp
+g++ -w -O3 -o Asteria Asteria3d.cpp
 
 echo ""
 echo "Compilation complete. You can launch Asteria by executing the launch  bash script."

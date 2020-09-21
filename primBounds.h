@@ -48,11 +48,10 @@ bool allBounds(Arrays *u) {
 		if (!bounds_zout(u)) { cout << "primBounds::allBounds:: Could not set the boundaries for z_out !" << endl; return false; }
 	}
 
-
 	/* For the whole grid (including ghost cells), compute the cell-centered magnetic fields (if MHD) and the conserved variables */
-	for(int k = 0; k < u->Nz+2*NGHOST; k++)
-	for(int j = 0; j < u->Ny+2*NGHOST; j++)
-	for(int i = 0; i < u->Nx+2*NGHOST; i++)
+	for(int k = u->k_dl; k <= u->k_dr; k++)
+	for(int j = u->j_dl; j <= u->j_dr; j++)
+	for(int i = u->i_dl; i <= u->i_dr; i++)
 	{
 #ifdef MHD
 		BCenter(u, i, j, k);
@@ -60,6 +59,7 @@ bool allBounds(Arrays *u) {
 		toConserved(u, i, j, k, gamma);
 
 	}
+
 
 
 	return true;
@@ -74,8 +74,8 @@ bool bounds_xin(Arrays *u) {
 	if (u->boundaries[0] == bounds::PERIODIC) {
 
 		/* Loop through the transverse dimensions (y, z) */
-		for(int k = 0; k < u->Nz+2*NGHOST*(u->Nz>1); k++)
-		for(int j = 0; j < u->Ny+2*NGHOST*(u->Ny>1); j++)
+		for(int k = u->k_dl; k <= u->k_dr; k++)
+		for(int j = u->j_dl; j <= u->j_dr; j++)
 		{
 			/* Loop though the ghost cells for (M)HD variables */
 			for (int i = 0; i < NGHOST; i++) {
@@ -86,12 +86,37 @@ bool bounds_xin(Arrays *u) {
 #ifdef MHD
 				u->uC(6, i, j, k) = u->uC(6, u->Nx+i, j, k); u->uC(7, i, j, k) = u->uC(7, u->Nx+i, j, k);
 				u->uC(5, i, j, k) = u->uC(5, u->Nx+i, j, k);
+				if (isnan(u->uC(7, i, j, k))) cout << "bounds_xin: uC[7] is NaN !" << endl;
 #endif // MHD
 
 			}
 
 		}
 	}
+
+	if (u->boundaries[0] == bounds::OUTFLOW) {
+
+		/* Loop through the transverse dimensions (y, z) */
+		for(int k = u->k_dl; k <= u->k_dr; k++)
+		for(int j = u->j_dl; j <= u->j_dr; j++)
+		{
+			/* Loop though the ghost cells for (M)HD variables */
+			for (int i = 0; i < NGHOST; i++) {
+				u->uP(0, i, j, k) = u->uP(0, u->i_cl, j, k);
+
+				u->uP(1, i, j, k) = u->uP(1, u->i_cl, j, k); u->uP(2, i, j, k) = u->uP(2, u->i_cl, j, k); u->uP(3, i, j, k) = u->uP(3, u->i_cl, j, k);
+				u->uP(4, i, j, k) = u->uP(4, u->i_cl, j, k);
+#ifdef MHD
+				u->uC(6, i, j, k) = u->uC(6, u->i_cl, j, k); u->uC(7, i, j, k) = u->uC(7, u->i_cl, j, k);
+				u->uC(5, i, j, k) = u->uC(5, u->i_cl, j, k);
+				if (isnan(u->uC(7, i, j, k))) cout << "bounds_xin: uC[7] is NaN !" << endl;
+#endif // MHD
+				
+			}
+
+		}
+	}
+
 
 	return true;
 }
@@ -125,6 +150,31 @@ bool bounds_xout(Arrays *u) {
 
 		}
 	}
+	if (u->boundaries[1] == bounds::OUTFLOW) {
+
+		/* Loop through the transverse dimensions (y, z) */
+		for(int k = u->k_dl; k <= u->k_dr; k++)
+		for(int j = u->j_dl; j <= u->j_dr; j++)
+		{
+			/* Loop though the ghost cells for (M)HD variables */
+			for (int i = 0; i <= u->i_gl; i++) {
+				u->uP(0, u->i_gr+i, j, k) = u->uP(0, u->i_cr, j, k);
+				u->uP(1, u->i_gr+i, j, k) = u->uP(1, u->i_cr, j, k); u->uP(2, u->i_gr+i, j, k) = u->uP(2, u->i_cr, j, k); u->uP(3, u->i_gr+i, j, k) = u->uP(3, u->i_cr, j, k);
+				u->uP(4, u->i_gr+i, j, k) = u->uP(4, u->i_cr, j, k);
+#ifdef MHD
+				u->uC(6, u->i_gr+i, j, k) = u->uC(6, u->i_cr, j, k); u->uC(7, u->i_gr+i, j, k) = u->uC(7, u->i_cr, j, k);
+				u->uC(5, u->i_gr+i, j, k) = u->uC(5, u->i_cr, j, k);
+				
+#endif // MHD
+
+			}
+#ifdef MHD
+			u->uC(5, u->i_dr+1, j, k) = u->uC(5, u->i_cr, j, k);
+#endif // MHD
+
+
+		}
+	}
 
 	return true;
 }
@@ -138,8 +188,8 @@ bool bounds_yin(Arrays *u) {
 	if (u->boundaries[2] == bounds::PERIODIC) {
 
 		/* Loop through the transverse dimensions (x,z) */
-		for(int k = 0; k < u->Nz+2*NGHOST*(u->Nz>1); k++)
-		for(int i = 0; i < u->Nx+2*NGHOST*(u->Nx>1); i++)
+		for(int k = u->k_dl; k <= u->k_dr; k++)
+		for(int i = u->i_dl; i <= u->i_dr; i++)
 		{
 			/* Loop through the ghost cells */
 			for (int j = 0; j < NGHOST; j++) {
@@ -149,11 +199,32 @@ bool bounds_yin(Arrays *u) {
 #ifdef MHD
 				u->uC(5, i, j, k) = u->uC(5, i, u->Ny+j, k); u->uC(7, i, j, k) = u->uC(7, i, u->Ny+j, k);
 				u->uC(6, i, j, k) = u->uC(6, i, u->Ny+j, k);
+				if (isnan(u->uC(7, i, j, k))) cout << "bounds_yin: uC[7] is NaN !" << endl;
 #endif // MHD
 
 			}
 		}
 
+	}
+	if (u->boundaries[2] == bounds::OUTFLOW) {
+
+		/* Loop through the transverse dimensions (x,z) */
+		for(int k = u->k_dl; k <= u->k_dr; k++)
+		for(int i = u->i_dl; i <= u->i_dr; i++)
+		{
+			/* Loop through the ghost cells */
+			for (int j = 0; j < NGHOST; j++) {
+				u->uP(0, i, j, k) = u->uP(0, i, u->j_cl, k);
+				u->uP(1, i, j, k) = u->uP(1, i, u->j_cl, k); u->uP(2, i, j, k) = u->uP(2, i, u->j_cl, k); u->uP(3, i, j, k) = u->uP(3, i, u->j_cl, k);
+				u->uP(4, i, j, k) = u->uP(4, i, u->j_cl, k);
+#ifdef MHD
+				u->uC(5, i, j, k) = u->uC(5, i, u->j_cl, k); u->uC(7, i, j, k) = u->uC(7, i, u->j_cl, k);
+				u->uC(6, i, j, k) = u->uC(6, i, u->j_cl, k);
+				if (isnan(u->uC(7, i, j, k))) cout << "bounds_yin: uC[7] is NaN !" << endl;
+#endif // MHD
+
+			}
+		}
 
 	}
 
@@ -178,15 +249,38 @@ bool bounds_yout(Arrays *u) {
 				u->uP(4, i, u->j_gr+j, k) = u->uP(4, i, u->j_cl+j, k);
 #ifdef MHD
 				u->uC(5, i, u->j_gr+j, k) = u->uC(5, i, u->j_cl+j, k); u->uC(7, i, u->j_gr+j, k) = u->uC(7, i, u->j_cl+j, k);
-				//u->uC(5, u->i_gr+i, j, k) = u->uC(5, u->i_cl+i, j, k);
 				u->uC(6, i, u->j_gr+j, k) = u->uC(6, i, u->j_cl+j, k);
-				//cout << u->uC(6, i, u->j_gr+j, k) << " --> " << u->uC(6, i, u->j_cl+j, k) << endl;
 #endif // MHD
 
 			}
 #ifdef MHD
-			//u->uC(5, u->i_dr+1, j, k) = u->uC(5, u->i_cl, j, k); 
 			u->uC(6, i, u->j_dr+1, k) = u->uC(6, i, u->j_cl+u->j_cl, k);
+#endif // MHD
+
+
+		}
+	}
+	if (u->boundaries[3] == bounds::OUTFLOW) {
+
+		/* Loop through the transverse dimensions (y, z) */
+
+		for(int k = u->k_dl; k <= u->k_dr; k++)
+		for(int i = u->i_dl; i <= u->i_dr; i++)
+		{
+			/* Loop though the ghost cells for (M)HD variables */
+			for (int j = 0; j <= u->j_gl; j++) {
+				u->uP(0, i, u->j_gr+j, k) = u->uP(0, i, u->j_cr, k);
+
+				u->uP(1, i, u->j_gr+j, k) = u->uP(1, i, u->j_cr, k); u->uP(2, i, u->j_gr+j, k) = u->uP(2, i, u->j_cr, k); u->uP(3, i, u->j_gr+j, k) = u->uP(3, i, u->j_cr, k);
+				u->uP(4, i, u->j_gr+j, k) = u->uP(4, i, u->j_cr, k);
+#ifdef MHD
+				u->uC(5, i, u->j_gr+j, k) = u->uC(5, i, u->j_cr, k); u->uC(7, i, u->j_gr+j, k) = u->uC(7, i, u->j_cr, k);
+				u->uC(6, i, u->j_gr+j, k) = u->uC(6, i, u->j_cr, k);
+#endif // MHD
+
+			}
+#ifdef MHD
+			u->uC(6, i, u->j_dr+1, k) = u->uC(6, i, u->j_cr, k);
 #endif // MHD
 
 
@@ -200,15 +294,108 @@ bool bounds_yout(Arrays *u) {
 
 
 
+
+
 bool bounds_zin(Arrays *u) {
 
+	if (u->boundaries[4] == bounds::PERIODIC) {
+
+		/* Loop through the transverse dimensions (x,z) */
+		for(int j = u->j_dl; j <= u->j_dr; j++)
+		for(int i = u->i_dl; i <= u->i_dr; i++)
+		{
+			/* Loop through the ghost cells */
+			for (int k = 0; k < NGHOST; k++) {
+				u->uP(0, i, j, k) = u->uP(0, i, j, u->Nz+k);
+				u->uP(1, i, j, k) = u->uP(1, i, j, u->Nz+k); u->uP(2, i, j, k) = u->uP(2, i, j, u->Nz+k); u->uP(3, i, j, k) = u->uP(3, i, j, u->Nz+k);
+				u->uP(4, i, j, k) = u->uP(4, i, j, u->Nz+k);
+#ifdef MHD
+				u->uC(5, i, j, k) = u->uC(5, i, j, u->Nz+k); u->uC(7, i, j, k) = u->uC(7, i, j, u->Nz+k);
+				u->uC(6, i, j, k) = u->uC(6, i, j, u->Nz+k);
+#endif // MHD
+
+			}
+		}
+
+	}
+	if (u->boundaries[4] == bounds::OUTFLOW) {
+
+		/* Loop through the transverse dimensions (x,z) */
+		for(int j = u->j_dl; j <= u->j_dr; j++)
+		for(int i = u->i_dl; i <= u->i_dr; i++)
+		{
+			/* Loop through the ghost cells */
+			for (int k = 0; k < NGHOST; k++) {
+				u->uP(0, i, j, k) = u->uP(0, i, j, u->k_cl);
+				u->uP(1, i, j, k) = u->uP(1, i, j, u->k_cl); u->uP(2, i, j, k) = u->uP(2, i, j, u->k_cl); u->uP(3, i, j, k) = u->uP(3, i, j, u->k_cl);
+				u->uP(4, i, j, k) = u->uP(4, i, j, u->k_cl);
+#ifdef MHD
+				u->uC(5, i, j, k) = u->uC(5, i, j, u->k_cl); u->uC(7, i, j, k) = u->uC(7, i, j, u->k_cl);
+				u->uC(6, i, j, k) = u->uC(6, i, j, u->k_cl);
+#endif // MHD
+
+			}
+		}
+
+	}
 
 	return true;
 }
 
-
 bool bounds_zout(Arrays *u) {
 
+	if (u->boundaries[5] == bounds::PERIODIC) {
+
+		/* Loop through the transverse dimensions (y, z) */
+
+		for(int j = u->j_dl; j <= u->j_dr; j++)
+		for(int i = u->i_dl; i <= u->i_dr; i++)
+		{
+			/* Loop though the ghost cells for (M)HD variables */
+			for (int k = 0; k <= u->k_gl; k++) {
+				u->uP(0, i, j, u->k_gr+k) = u->uP(0, i, j, u->k_cl+k);
+
+				u->uP(1, i, j, u->k_gr+k) = u->uP(1, i, j, u->k_cl+k); u->uP(2, i, j, u->k_gr+k) = u->uP(2, i, j, u->k_cl+k); u->uP(3, i, j, u->k_gr+k) = u->uP(3, i, j, u->k_cl+k);
+				u->uP(4, i, j, u->k_gr+k) = u->uP(4, i, j, u->k_cl+k);
+#ifdef MHD
+				u->uC(5, i, j, u->k_gr+k) = u->uC(5, i, j, u->k_cl+k); u->uC(7, i, j, u->k_gr+k) = u->uC(7, i, j, u->k_cl+k);
+				u->uC(6, i, j, u->k_gr+k) = u->uC(6, i, j, u->k_cl+k);
+#endif // MHD
+
+			}
+#ifdef MHD
+			u->uC(6, i, j, u->k_dr+1) = u->uC(6, i, j, u->k_cl+u->k_cl);
+#endif // MHD
+
+
+		}
+	}
+	if (u->boundaries[5] == bounds::OUTFLOW) {
+
+		/* Loop through the transverse dimensions (y, z) */
+
+		for(int j = u->j_dl; j <= u->j_dr; j++)
+		for(int i = u->i_dl; i <= u->i_dr; i++)
+		{
+			/* Loop though the ghost cells for (M)HD variables */
+			for (int k = 0; k <= u->k_gl; k++) {
+				u->uP(0, i, j, u->k_gr+k) = u->uP(0, i, j, u->k_cr);
+
+				u->uP(1, i, j, u->k_gr+k) = u->uP(1, i, j, u->k_cr); u->uP(2, i, j, u->k_gr+k) = u->uP(2, i, j, u->k_cr); u->uP(3, i, j, u->k_gr+k) = u->uP(3, i, j, u->k_cr);
+				u->uP(4, i, j, u->k_gr+k) = u->uP(4, i, j, u->k_cr);
+#ifdef MHD
+				u->uC(5, i, j, u->k_gr+k) = u->uC(5, i, j, u->k_cr); u->uC(7, i, j, u->k_gr+k) = u->uC(7, i, j, u->k_cr);
+				u->uC(6, i, j, u->k_gr+k) = u->uC(6, i, j, u->k_cr);
+#endif // MHD
+
+			}
+#ifdef MHD
+			u->uC(6, i, j, u->k_dr+1) = u->uC(6, i, j, u->k_cr);
+#endif // MHD
+
+
+		}
+	}
 
 	return true;
 }

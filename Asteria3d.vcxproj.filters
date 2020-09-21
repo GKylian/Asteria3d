@@ -31,6 +31,9 @@
     <Filter Include="Probs">
       <UniqueIdentifier>{e8abbca9-d348-4c0e-bbb1-9e39963c56e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Riemann">
+      <UniqueIdentifier>{c3720993-26ec-4353-ac1d-e341edcd237f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Asteria3d.cpp">
@@ -109,6 +112,27 @@
     </ClInclude>
     <ClInclude Include="Export\vtk.h">
       <Filter>Export</Filter>
+    </ClInclude>
+    <ClInclude Include="Riemann\hllc.h">
+      <Filter>Riemann</Filter>
+    </ClInclude>
+    <ClInclude Include="Riemann\hlld.h">
+      <Filter>Riemann</Filter>
+    </ClInclude>
+    <ClInclude Include="Riemann\hlle.h">
+      <Filter>Riemann</Filter>
+    </ClInclude>
+    <ClInclude Include="probs\sod.h">
+      <Filter>Probs</Filter>
+    </ClInclude>
+    <ClInclude Include="Export\csv.h">
+      <Filter>Export</Filter>
+    </ClInclude>
+    <ClInclude Include="Reconstruction\pcm.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="Eq\CT.h">
+      <Filter>Eq</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

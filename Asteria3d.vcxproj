@@ -161,7 +161,9 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Eq\AdiabHD.h" />
     <ClInclude Include="Eq\AdiabMHD.h" />
+    <ClInclude Include="Eq\CT.h" />
     <ClInclude Include="Eq\IsoMHD.h" />
+    <ClInclude Include="Export\csv.h" />
     <ClInclude Include="Export\vtk.h" />
     <ClInclude Include="old\Arrays.h" />
     <ClInclude Include="old\Eigenvalues.h" />
@@ -175,8 +177,13 @@
     <ClInclude Include="primBounds.h" />
     <ClInclude Include="prob.h" />
     <ClInclude Include="probs\otvortex.h" />
+    <ClInclude Include="probs\sod.h" />
     <ClInclude Include="Reconstruction\eigen.h" />
+    <ClInclude Include="Reconstruction\pcm.h" />
     <ClInclude Include="Reconstruction\plm.h" />
+    <ClInclude Include="Riemann\hllc.h" />
+    <ClInclude Include="Riemann\hlld.h" />
+    <ClInclude Include="Riemann\hlle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

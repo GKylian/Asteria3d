@@ -66,11 +66,23 @@ long double Phii(Arrays *u, int i, int j, int k) {
 
 */
 
-bool Problem(Arrays *u);
+bool Problem(Arrays *u, std::vector<Export> *out);
 bool DoInLoop(Arrays *u);
 
 
-bool Problem(Arrays *u) {
+bool Problem(Arrays *u, std::vector<Export> *out) {
+
+	/* Set array parameters */
+	long double x0 = 0.0; long double xn = 1.0; int Nx = 64; long double dx = (xn-x0)/(Nx-1.0); if (Nx <= 1) dx = 1.0;
+	long double y0 = 0.0; long double yn = 1.0; int Ny = 64; long double dy = (yn-y0)/(Ny-1.0); if (Ny <= 1) dy = 1.0;
+	long double z0 = 0.0; long double zn = 1.0; int Nz = 1; long double dz = (zn-z0)/(Nz-1.0); if (Nz <= 1) dz = 1.0;
+
+	u->boundaries[0] = bounds::PERIODIC; u->boundaries[1] = bounds::PERIODIC; /* x */
+	u->boundaries[2] = bounds::PERIODIC; u->boundaries[3] = bounds::PERIODIC;
+
+	/* Create the arrays */
+	u->initAll(Nx, Ny, Nz); u->setRange(x0, xn, y0, yn, z0, zn); u->seth(dx, dy, dz);
+	cout << "INIT:: Domain size: (" << u->Nx << ", " << u->Ny << ", " << u->Nz << ")." << endl;
 
 	/* Cycle through the domain (with one ghost cell) */
 	for(int k = u->k_gl; k <= u->k_gr; k++)
@@ -113,24 +125,35 @@ bool Problem(Arrays *u) {
 	for(int j = u->j_cl; j <= u->j_cr; j++)
 	for(int i = u->i_cl; i <= u->i_cr; i++)
 	{
+#ifdef MHD
 		/* Compute cell-centered magnetic fields (in uP) from interfaces (in uC) */
 		BCenter(u, i, j, k);
+#endif // MHD
+
 		
 		/* Compute primitive variables */
 		toConserved(u, i, j, k, gamma);
 
 
 	}
+#ifdef MHD
+	long double maxDiv = 0.0;
+	for (int k = u->k_cl; k <= u->k_cr; k++)
+		for (int j = u->j_cl; j <= u->j_cr; j++)
+			for (int i = u->i_cl; i <= u->i_cr; i++)
+			{
+				maxDiv = fmaxl(fabsl(maxDiv), fabsl(getDiv(u, i, j, k)));
 
-	long double maxDiv = 0.0; 
-	for(int k = u->k_cl; k <= u->k_cr; k++)
-	for(int j = u->j_cl; j <= u->j_cr; j++)
-	for(int i = u->i_cl; i <= u->i_cr; i++)
-	{
-		maxDiv = fmaxl(fabsl(maxDiv), fabsl(getDiv(u, i, j, k)));
-		
-	}
+			}
 	std::cout << "Maximum divergence after problem initialization: " << maxDiv << std::endl;
+
+
+#endif // MHD
+
+	/* Set up the output */
+	std::vector<exports> vtkvar{ exports::PRIM };
+	Export vtkout{ 0, vtkvar, 0, 0, 0, 0, 0, 0, false, "prims" };
+	out->push_back(vtkout);
 
 	return true;
 }
@@ -138,6 +161,7 @@ bool Problem(Arrays *u) {
 
 bool DoInLoop(Arrays *u) {
 
+#ifdef MHD
 	//Check the divergence
 	long double maxDiv = 0.0; 
 	for(int k = u->k_cl; k <= u->k_cr; k++)
@@ -145,12 +169,32 @@ bool DoInLoop(Arrays *u) {
 	for(int i = u->i_cl; i <= u->i_cr; i++)
 	{
 		maxDiv = fmaxl(fabsl(maxDiv), fabsl(getDiv(u, i, j, k)));
-		if (u->uP(0, i, j, k) != 25.0/(36*M_PI) || u->uC(0, i, j, k) != 25.0/(36*M_PI)) {
-			std::cout << "Density: " << u->uP(0, i, j, k) << ", or C: " << u->uC(0, i, j, k) << std::endl;
-		}
 		
 	}
 	std::cout << "Maximum divergence in DoInLoop: " << maxDiv << std::endl;
+
+	
+
+#endif // MHD
+	return true;
+}
+
+bool check(Arrays *u){
+	/* Check that nothing NaN, that rho, P and E are positive */
+	for(int k = u->k_dl; k <= u->k_dr; k++)
+	for(int j = u->j_dl; j <= u->j_dr; j++)
+	for(int i = u->i_dl; i <= u->i_dr; i++)
+	{
+		for(int n = 0; n < NVAL; n++){
+			if (std::isnan(u->uP(n, i, j, k))) { std::cout << "check:: uP[" << n << "](" << i << ", " << j << ", " << k << ") is NaN." << std::endl; return false; }
+			if (std::isnan(u->uC(n, i, j, k))) { std::cout << "check:: uC[" << n << "](" << i << ", " << j << ", " << k << ") is NaN." << std::endl; return false; }
+        }
+		if (u->uC(0, i, j, k) <= 0) { std::cout << "check:: rho at (" << i << ", " << j << ", " << k << ") is null or negative." << std::endl; return false; }
+		if (u->uP(0, i, j, k) <= 0) { std::cout << "check:: rho at (" << i << ", " << j << ", " << k << ") is null or negative." << std::endl; return false; }
+
+		if (u->uC(4, i, j, k) <= 0) { std::cout << "check:: E at (" << i << ", " << j << ", " << k << ") is null or negative." << std::endl; return false; }
+		if (u->uP(4, i, j, k) <= 0) { std::cout << "check:: P at (" << i << ", " << j << ", " << k << ") is null or negative." << std::endl; return false; }
+	}
 
 	return true;
 }

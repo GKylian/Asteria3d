@@ -567,7 +567,7 @@ int main()
                 long double My = (gs.at(0, xi, yi+1)+gs.at(0, xi, yi))/2.0;
 
                 _us.at(1, xi, yi) -= dt/dx*hrho*(phir_x-phil_x);
-                _us.at(2, xi, yi) -= dt/dx*hrho*(phir_y-phil_y);
+                _us.at(2, xi, yi) -= dt/dy*hrho*(phir_y-phil_y);
                 _us.at(4, xi, yi) -= dt/dx*(fs.at(0, xi, yi)*(phic-phil_x) + fs.at(0, xi+1, yi)*(phir_x-phic));
                 _us.at(4, xi, yi) -= dt/dy*(gs.at(0, xi, yi)*(phic-phil_y) + gs.at(0, xi, yi+1)*(phir_y-phic));
             }

@@ -1,6 +1,15 @@
 #!/bin/bash
 
 echo ""
+read -p 'Delete exports folders content (remove exports of previous simulations) ? [y/n]: ' expdl
+
+if [ $expdl == "y" ]; then
+    echo "Delete the exports folder's content..."
+    rm -r exports
+    mkdir exports
+fi
+
+echo ""
 read -p 'Launching Asteria. Are you sure ? [y/n]: ' iso
 
 if [ $iso != "y" ]; then

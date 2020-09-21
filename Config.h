@@ -1,5 +1,5 @@
 
-#define MHD
-#define HLLC
+
+#define HLLE
 #define CHAR
 #define TRACING

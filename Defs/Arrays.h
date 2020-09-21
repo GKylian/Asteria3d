@@ -22,10 +22,14 @@ public:
 
 
 	const T &get(int x, int y, int z) const {
+		if (x >= Nx || y >= Ny || z >= Nz)
+			cout << "ERROR:::Arrays.h::Array::get() Trying to access an out-of-bound element !" << endl;
 		return m_array[z*Nx*Ny + y*Nx + x];
 	}
 
 	const T &get(int x, int y) const {
+		if (x >= Nx || y >= Ny)
+			cout << "ERROR:::Arrays.h::Array::get() Trying to access an out-of-bound element !" << endl;
 		return m_array[y * Nx + x];
 	}
 
@@ -35,7 +39,7 @@ public:
 	}
 
 	void setSize(int _Nx, int _Ny, int _Nz) {
-		Nx = _Nx; int Ny = _Ny; int Nz = _Nz;
+		Nx = _Nx; Ny = _Ny; Nz = _Nz;
 		m_array.resize(Nx * Ny * Nz);
 		//if (_Nz == 1) dim = 2; else dim = 3;
 		dim = 3;
@@ -49,6 +53,10 @@ public:
 		Nx = _Nx; int Ny = _Ny; int Nz = 1;
 		m_array.resize(Nx * Ny * Nz);
 		dim = 2;
+	}
+
+	void printSize() {
+		cout << "(" << Nx << ", " << Ny << ", " << Nz << ")";
 	}
 
 	std::vector<T> &getVector() {
@@ -81,13 +89,18 @@ struct Arrays
 	Array<long double> inty[NVAL];
 	Array<long double> intz[NVAL];
 
+	//The three fluxes arrays.
+	Array<long double> F_x[NVAL];
+	Array<long double> F_y[NVAL];
+	Array<long double> F_z[NVAL];
+
 	
 	
-	int Nx, Ny, Nz = 0; int dim = 0.0;
+	int Nx, Ny, Nz = 0; int dim = 0;
 	long double dx, dy, dz = 0;
 	long double x0, xn, y0, yn, z0, zn = 0.0;
 	bounds boundaries[6]; /* xin, xout, yin, yout, zin, zout */
-	long double t; long double dt; 
+	long double t; long double dt; int s;
 
 
 	//dl/dr: first/last cell of the whole domain	gl/gr: last/first ghost cell	cl/cr: first/last cell of the computation domain
@@ -96,16 +109,29 @@ struct Arrays
 	int k_dl, k_gl, k_cl, k_dr, k_gr, k_cr;
 
 	void initAll(int nx, int ny, int nz) {
-		Nx = nx; Ny = ny; Nz = nz;
+		Nx = nx; Ny = ny; Nz = nz; s = 0;
 		for (int i = 0; i < NVAL; i++)
 		{
 			//if (i == 5 || i == 6) continue;
-			cons[i].setSize(nx+2*NGHOST+(i==5), ny+2*NGHOST+(i==6), nz+2*NGHOST+(i==7));
-			prim[i].setSize(nx+2*NGHOST, ny+2*NGHOST, nz+2*NGHOST);
+			cons[i].setSize(Nx+(Nx>1)*(2*NGHOST+(i==5)), Ny+(Ny>1)*(2*NGHOST+(i==6)), Nz+(Nz>1)*(2*NGHOST+(i==7)));
+			//cout << "cons[" << i << "] array size: "; cons[i].printSize(); cout << endl;
+			prim[i].setSize(Nx+(Nx>1)*2*NGHOST, Ny+(Ny>1)*2*NGHOST, Nz+(Nz>1)*2*NGHOST);
+			//cout << "prim[" << i << "] array size: "; prim[i].printSize(); cout << endl;
 
-			intx[i].setSize(2*(nx+2*NGHOST), ny+2*NGHOST, nz+2*NGHOST);
-			inty[i].setSize(nx+2*NGHOST, 2*(ny+2*NGHOST), nz+2*NGHOST);
-			intz[i].setSize(nx+2*NGHOST, ny+2*NGHOST, 2*(nz+2*NGHOST));
+			intx[i].setSize((Nx>1)*2*(Nx+2*NGHOST)+(Ny<=1), Ny+(Ny>1)*2*NGHOST, Nz+(Nz>1)*2*NGHOST);
+			//cout << "intx[" << i << "] array size: "; intx[i].printSize(); cout << endl;
+			inty[i].setSize(Nx+(Nx>1)*2*NGHOST, (Ny>1)*2*(Ny+2*NGHOST)+(Ny<=1), Nz+(Nz>1)*2*NGHOST);
+			//cout << "inty[" << i << "] array size: "; inty[i].printSize(); cout << endl;
+			intz[i].setSize(Nx+(Nx>1)*2*NGHOST, Ny+(Ny>1)*2*NGHOST, (Nz>1)*2*(Nz+2*NGHOST)+(Nz<=1));
+			//cout << "intz[" << i << "] array size: "; intz[i].printSize(); cout << endl;
+
+			F_x[i].setSize((Nx>1)*(Nx+2*NGHOST)+1, Ny+(Ny>1)*2*NGHOST, Nz+(Nz>1)*2*NGHOST);
+			//cout << "F_x[" << i << "] array size: "; F_x[i].printSize(); cout << endl;
+			//cout << "--> should be " << (Nx>1)*(Nx+2*NGHOST)+1 << ", " << Ny+(Ny>1)*2*NGHOST << ", " << Nz+(Nz>1)*2*NGHOST << endl;
+			F_y[i].setSize(Nx+(Nx>1)*2*NGHOST, (Ny>1)*(Ny+2*NGHOST)+1, Nz+(Nz>1)*2*NGHOST);
+			cout << "F_y[" << i << "] array size: "; F_y[i].printSize(); cout << endl;
+			F_z[i].setSize(Nx+(Nx>1)*2*NGHOST, Ny+(Ny>1)*2*NGHOST, (Nz>1)*(Nz+2*NGHOST)+1);
+			//cout << "F_z[" << i << "] array size: "; F_z[i].printSize(); cout << endl;
 		}
 		setIndexes();
 		dim = (nx > 1)+(ny > 1)+(nz > 1);
@@ -145,6 +171,7 @@ struct Arrays
 	Array<long double> &getP(int i) {
 		return prim[i];
 	}
+
 	long double &ix(int i, int xi, int yi, int zi) {
 		return intx[i].get(xi, yi, zi);
 	}
@@ -154,6 +181,20 @@ struct Arrays
 	long double &iz(int i, int xi, int yi, int zi) {
 		return intz[i].get(xi, yi, zi);
 	}
+
+	long double &Fx(int i, int xi, int yi, int zi) {
+		if (xi > i_dr || yi > j_dr || zi > k_dr) cout << "ERROR:::Arrays.h::Fx:: Out of bound: " << xi << ", " << yi << ", " << zi << endl;
+		return F_x[i].get(xi, yi, zi);
+	}
+	long double &Fy(int i, int xi, int yi, int zi) {
+		if (xi > i_dr || yi > j_dr || zi > k_dr) cout << "ERROR:::Arrays.h::Fy:: Out of bound: " << xi << ", " << yi << ", " << zi << endl;
+		return F_y[i].get(xi, yi, zi);
+	}
+	long double &Fz(int i, int xi, int yi, int zi) {
+		if (xi > i_dr || yi > j_dr || zi > k_dr) cout << "ERROR:::Arrays.h::Fz:: Out of bound: " << xi << ", " << yi << ", " << zi << endl;
+		return F_z[i].get(xi, yi, zi);
+	}
+
 
 	void pos(long double *x, int i, int j, int k) {
 		x[0] = x0+(i-i_cl)*dx;
@@ -168,7 +209,7 @@ struct Arrays
 			i_cr = NGHOST+Nx-1;		i_gr = NGHOST+Nx;	i_dr = 2*NGHOST+Nx-1;
 		}
 		else {
-			i_dl = 0; i_gl = 0; i_cl = 0; i_dr = 1; i_gr = 1; i_cr = 1;
+			i_dl = 0; i_gl = 0; i_cl = 0; i_dr = 0; i_gr = 0; i_cr = 0;
 		}
 
 		if (Ny > 1) {
@@ -176,7 +217,7 @@ struct Arrays
 			j_cr = NGHOST+Ny-1;		j_gr = NGHOST+Ny;	j_dr = 2*NGHOST+Ny-1;
 		}
 		else {
-			j_dl = 0; j_gl = 0; j_cl = 0; j_dr = 1; j_gr = 1; j_cr = 1;
+			j_dl = 0; j_gl = 0; j_cl = 0; j_dr = 0; j_gr = 0; j_cr = 0;
 		}
 
 		if (Nz > 1) {
@@ -184,7 +225,7 @@ struct Arrays
 			k_cr = NGHOST+Nz-1;		k_gr = NGHOST+Nz;	k_dr = 2*NGHOST+Nz-1;
 		}
 		else {
-			k_dl = 0; k_gl = 0; k_cl = 0; k_dr = 1; k_gr = 1; k_cr = 1;
+			k_dl = 0; k_gl = 0; k_cl = 0; k_dr = 0; k_gr = 0; k_cr = 0;
 		}
 
 	}

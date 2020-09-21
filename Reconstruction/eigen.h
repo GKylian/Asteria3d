@@ -84,6 +84,13 @@ bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long d
         cout << "Magnetosonic case" << endl;
     }
 
+    if (isnan(beta1)) {
+        cout << "NaN:::eigen.h::getEigen:: beta 1 is NaN !" << endl;
+        cout << "Magnetic field: " << w[5] << ", " << w[6] << ", " << w[7] << endl;
+        cout << "Bperp: " << Bperp << ", Bn: " << Bn << endl;
+        cout << "null(Bperp): " << null(Bperp) << ", null(Bn): " << null(Bn) << " --> null(Bperp) && !null(Bn): " << (null(Bperp) && !null(Bn)) << endl;
+    }
+
 
     if (isnan(alf)) cout << "NaN::EIGENVALUES.H::getEigen:: alpha_f is NaN; (alpha_f)^2 = " << (a2 - Cs2)/(Cf2 - Cs2) << endl;
     if (isnan(als)) cout << "NaN::EIGENVALUES.H::getEigen:: alpha_s is NaN; (alpha_s)^2 = " << (Cf2 - a2)/(Cf2 - Cs2) << endl;
@@ -91,10 +98,10 @@ bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long d
         cout << "B(Bn, B1, B2) = " << Bn << ", " << B1 << ", " << B2 << endl;
     }
 
-    long double Cff = Cf*alf; long double Css = Cs*als;
-    long double Qf = Cf*alf*Sn; long double Qs = Cs*als*Sn;
-    long double Af = a*alf*rtrh; long double As = a*als*rtrh;
-    long double N = 0.5/a2;
+    long double Cff = Cf*alf; long double Css = Cs*als; if (isnan(Cff)) cout << "NaN:::eigen.h::getEigen:: Cff is NaN !" << endl;   if (isnan(Css)) cout << "NaN:::eigen.h::getEigen:: Css is NaN !" << endl;
+    long double Qf = Cf*alf*Sn; long double Qs = Cs*als*Sn; if (isnan(Qf)) cout << "NaN:::eigen.h::getEigen:: Qf is NaN !" << endl;   if (isnan(Qs)) cout << "NaN:::eigen.h::getEigen:: Qs is NaN !" << endl;
+    long double Af = a*alf*rtrh; long double As = a*als*rtrh; if (isnan(Af)) cout << "NaN:::eigen.h::getEigen:: Af is NaN !" << endl;   if (isnan(As)) cout << "NaN:::eigen.h::getEigen:: Af is NaN !" << endl;
+    long double N = 0.5/a2; if (isnan(N)) cout << "NaN:::eigen.h::getEigen:: a is NaN,   a2 = " << a2 << endl;
 
 
     //2) Compute the eigenvalues
@@ -168,7 +175,7 @@ void getEigen() {
 #else // Not ISO //
 
 /* Get eigenvalues for adiabatic HD system */
-void getEigen() {
+bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long double R[][NWAVE]) {
     long double rh = w[0];  long double vn = w[1];  long double P = w[4];
     if (rh <= 0) {
         cout << "RANGE-ERROR::getEigenHD:: rho <= 0" << endl; return false;
