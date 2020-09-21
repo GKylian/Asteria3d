@@ -12,7 +12,7 @@ bool getFluxes(Arrays *u, int i, int j, int k) {
 	long double FL[NVAL] = { 0 }; long double FR[NVAL] = { 0 }; long double Fs[NVAL] = { 0 };
 
 	if (u->Nx > 1) {
-
+		 
 		/* ----- 0. Load values into arrays ----- */
 		long double uL[NVAL] = { 0 }; long double uR[NVAL] = { 0 }; long double wL[NVAL] = { 0 }; long double wR[NVAL] = { 0 };
 		for (int n = 0; n < NVAL; n++) {    uL[n] = u->ix(n, iL, j, k); uR[n] = u->ix(n, iR, j, k);    }

@@ -8,7 +8,7 @@
 ---> bool allBounds(Arrays *u)
 	 <-> Applies all the boundary conditions (BCs) by calling the corresponding functions.
 	 - Arrays *u: the arrays containing the conserved values we're applying the BCs to.
-<->
+<-> 
 <->
 ---> bool bounds_xin(Arrays *u)
 	 <-> Apply the BC at the inner boundary of x (x0).

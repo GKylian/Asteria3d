@@ -10,7 +10,7 @@
 ---> MHD: Is the gas MHD (B != 0) ?
 ---> CYLINDRICAL: Are we using cylindrical coordinates ?
 ---> HLL/HLLC/HLLD: What Riemann are we using ? (HLLD default for MHD, HLLC default for HD)
----> TRACING: Do we perform characteristic tracing in the reconstruction ?
+---> TRACING: Do we perform characteristic tracing in the reconstruction ? 
 ---> NGHOST: The number of ghost cells added to N in each direction
 ---> NVAL: The numbe of variables in u (MHD? Iso?)
 ---> NWAVES: The number of characteristic waves (and the number of eigenvectors/eigenvalues)

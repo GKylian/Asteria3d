@@ -7,7 +7,7 @@ using namespace std;
 
 #include "../Defs/Arrays.h"
 
-bool vtk_add(Arrays *u, bool ghosts, exports out, string fname)
+bool vtk_add(Arrays *u, bool ghosts, exports out, string fname) 
 {
 	
 	ofstream vtk(fname, ios::out | ios::app);

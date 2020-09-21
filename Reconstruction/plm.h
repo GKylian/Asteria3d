@@ -365,7 +365,7 @@ bool PLM(Arrays *u, int i, int j, int k) {
         if (nx > 1) { u->ix(1, iR, j, k) += u->dt/2.0 *gx; u->ix(1, iL, j, k) += u->dt/2.0 *gx; }
         if (ny > 1) { u->iy(2, i, jR, k) += u->dt/2.0 *gy; u->iy(2, i, jL, k) += u->dt/2.0 *gy; }
         if (nz > 1) { u->iz(3, i, j, kR) += u->dt/2.0 *gz; u->iz(3, i, j, kL) += u->dt/2.0 *gz; }
-    }
+    } 
     else {
         long double dpdx_p = (Phii(u, i+1, j, k)-Phii(u, i, j, k))/u->dx;   long double dpdx_m = (Phii(u, i, j, k)-Phii(u, i-1, j, k))/u->dx;
         long double dpdy_p = (Phii(u, i, j+1, k)-Phii(u, i, j, k))/u->dy;   long double dpdy_m = (Phii(u, i, j, k)-Phii(u, i, j-1, k))/u->dy;

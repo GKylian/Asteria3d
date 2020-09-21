@@ -9,7 +9,7 @@
 ---> bool BCenter(Arrays *uP, Arrays *uC, int i, int j, int k)
      <-> Computes B at cell center (in uP) from B at interfaces (in uC) for cell (i, j, k)
 --->  - Arrays *u: the primitive variables, with B at cell center and the conserved variables, with B at interfaces
---->  - int i, j, k: the cell indices
+--->  - int i, j, k: the cell indices 
 <->
 <->
 ---> bool toConserved(Arrays *u, int i, int j, int k)

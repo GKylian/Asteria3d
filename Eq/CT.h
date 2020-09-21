@@ -34,7 +34,7 @@ long double getEy(Arrays *u, int i, int j, int k) {
 }
 
 
-/* ----- Get Ey at (i-1/2, j-1/2, k) ----- */
+/* ----- Get Ey at (i-1/2, j-1/2, k) ----- */ 
 long double getEz(Arrays *u, int i, int j, int k) {
 
 }

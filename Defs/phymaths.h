@@ -8,7 +8,7 @@ long double sgn(long double x) {
 	return (long double)((0.0 < x) - (x < 0.0));
 }
 
-long double minmod(long double x, long double y) {
+long double minmod(long double x, long double y) { 
 	return sgn(x)*fminl(fabsl(x), fabsl(y)) * (x*y > 0.0);
 }
 

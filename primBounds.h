@@ -6,7 +6,7 @@ using namespace std;
 /*
 <-------------------- Functions -------------------->
 <->
----> bool allBounds(Arrays *u)
+---> bool allBounds(Arrays *u) 
 	 <-> Applies all the boundary conditions (BCs) by calling the corresponding functions.
 	 - Arrays *u: the arrays containing the primitive values we're applying the BCs to.
 <->

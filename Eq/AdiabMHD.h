@@ -11,7 +11,7 @@
 --->  - Arrays *u: the primitive variables, with B at cell center and the conserved variables, with B at interfaces
 --->  - int i, j, k: the cell indices
 <->
-<->
+<-> 
 ---> bool toConserved(Arrays *u, int i, int j, int k)
      <-> Computes the conserved variables (in uC) from the primitive variables (in uP) at (i, j, k)
      <-> !!! We assume B is already at cell center in uP

@@ -12,7 +12,7 @@ bool PCM(Arrays *u, int i, int j, int k) {
     
 
     if (u->Nx > 1) {
-        for (int n = 0; n < NVAL; n++)
+        for (int n = 0; n < NVAL; n++) 
         {
             u->ix(n, iR, j, k) = u->uC(n, i, j, k); u->ix(n, iL, j, k) = u->uC(n, i, j, k);
         }
