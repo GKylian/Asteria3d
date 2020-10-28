@@ -27,10 +27,10 @@
 
 
 /*  uP to uC  */
-bool toConserved(Arrays *u, int i, int j, int k, long double gamma) {
-    long double v2 = SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k));
+bool toConserved(Arrays *u, int i, int j, int k, ld gamma) {
+    ld v2 = SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k));
 
-    long double rh = u->uP(0, i, j, k); u->uC(0, i, j, k) = rh;
+    ld rh = u->uP(0, i, j, k); u->uC(0, i, j, k) = rh;
     u->uC(1, i, j, k) = rh*u->uP(1, i, j, k); u->uC(2, i, j, k) = rh*u->uP(2, i, j, k); u->uC(3, i, j, k) = rh*u->uP(3, i, j, k);
 
     u->uC(4, i, j, k) = u->uP(4, i, j, k)/(gamma-1) + rh*v2/2.0;
@@ -39,10 +39,10 @@ bool toConserved(Arrays *u, int i, int j, int k, long double gamma) {
     return true;
 }
 
-bool toConserved(long double *w, long double *u, long double gamma) {
-    long double v2 = SQ(w[1])+SQ(w[2])+SQ(w[3]);
+bool toConserved(ld *w, ld *u, ld gamma) {
+    ld v2 = SQ(w[1])+SQ(w[2])+SQ(w[3]);
 
-    long double rh = w[0]; u[0] = rh;
+    ld rh = w[0]; u[0] = rh;
     u[1] = rh*w[1]; u[2] = rh*w[2]; u[3] = rh*u[3];
 
     u[4] = w[4]/(gamma-1) + rh*v2/2.0;
@@ -55,11 +55,11 @@ bool toConserved(long double *w, long double *u, long double gamma) {
 }
 
 /*  uC to uP  */
-bool toPrimitive(Arrays *u, int i, int j, int k, long double gamma) {
-    long double rh = u->uC(0, i, j, k); u->uP(0, i, j, k) = rh;
+bool toPrimitive(Arrays *u, int i, int j, int k, ld gamma) {
+    ld rh = u->uC(0, i, j, k); u->uP(0, i, j, k) = rh;
     u->uP(1, i, j, k) = u->uC(1, i, j, k)/rh; u->uP(2, i, j, k) = u->uC(2, i, j, k)/rh; u->uP(3, i, j, k) = u->uC(3, i, j, k)/rh;
 
-    long double v2 = SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k));
+    ld v2 = SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k));
 
     u->uP(4, i, j, k) = (u->uC(4, i, j, k) - rh*v2/2.0) * (gamma-1);
 
@@ -67,15 +67,15 @@ bool toPrimitive(Arrays *u, int i, int j, int k, long double gamma) {
     return true;
 }
 
-bool toPrimitive(long double *u, long double *w, long double gamma) {
+bool toPrimitive(ld *u, ld *w, ld gamma) {
     if (null(u[0])) {
         std::cout << "ERROR:::AdiabHD.h::toPrimitive:: the density is null !" << std::endl;
         return false;
     }
-    long double rh = u[0]; w[0] = rh;
+    ld rh = u[0]; w[0] = rh;
     w[1] = u[1]/rh; w[2] = u[2]/rh; w[3] = u[3]/rh;
 
-    long double v2 = SQ(w[1])+SQ(w[2])+SQ(w[3]);
+    ld v2 = SQ(w[1])+SQ(w[2])+SQ(w[3]);
 
     w[4] = (u[4] - rh*v2/2.0)*(gamma-1);
 
@@ -91,11 +91,11 @@ bool toPrimitive(long double *u, long double *w, long double gamma) {
 }
 
 /* Transform the (i, j, k) interface values from primitive to conserved variables (used at the end of the reconstruction) */
-bool toConserved(Arrays *u, int dim, int i, int j, int k, long double gamma) {
+bool toConserved(Arrays *u, int dim, int i, int j, int k, ld gamma) {
     if (dim == 0) {
-        long double v2 = SQ(u->ix(1, i, j, k))+SQ(u->ix(2, i, j, k))+SQ(u->ix(3, i, j, k));
+        ld v2 = SQ(u->ix(1, i, j, k))+SQ(u->ix(2, i, j, k))+SQ(u->ix(3, i, j, k));
 
-        long double rh = u->ix(0, i, j, k); u->ix(0, i, j, k) = rh;
+        ld rh = u->ix(0, i, j, k); u->ix(0, i, j, k) = rh;
         u->ix(1, i, j, k) = rh*u->ix(1, i, j, k); u->ix(2, i, j, k) = rh*u->ix(2, i, j, k); u->ix(3, i, j, k) = rh*u->ix(3, i, j, k);
 
         u->ix(4, i, j, k) = u->ix(4, i, j, k)/(gamma-1) + rh*v2/2.0;
@@ -104,9 +104,9 @@ bool toConserved(Arrays *u, int dim, int i, int j, int k, long double gamma) {
         return true;
     }
     if (dim == 1) {
-        long double v2 = SQ(u->iy(1, i, j, k))+SQ(u->iy(2, i, j, k))+SQ(u->iy(3, i, j, k));
+        ld v2 = SQ(u->iy(1, i, j, k))+SQ(u->iy(2, i, j, k))+SQ(u->iy(3, i, j, k));
 
-        long double rh = u->iy(0, i, j, k); u->iy(0, i, j, k) = rh;
+        ld rh = u->iy(0, i, j, k); u->iy(0, i, j, k) = rh;
         u->iy(1, i, j, k) = rh*u->iy(1, i, j, k); u->iy(2, i, j, k) = rh*u->iy(2, i, j, k); u->iy(3, i, j, k) = rh*u->iy(3, i, j, k);
 
         u->iy(4, i, j, k) = u->iy(4, i, j, k)/(gamma-1) + rh*v2/2.0;
@@ -115,9 +115,9 @@ bool toConserved(Arrays *u, int dim, int i, int j, int k, long double gamma) {
         return true;
     }
     if (dim == 2) {
-        long double v2 = SQ(u->iz(1, i, j, k))+SQ(u->iz(2, i, j, k))+SQ(u->iz(3, i, j, k));
+        ld v2 = SQ(u->iz(1, i, j, k))+SQ(u->iz(2, i, j, k))+SQ(u->iz(3, i, j, k));
 
-        long double rh = u->iz(0, i, j, k); u->iz(0, i, j, k) = rh;
+        ld rh = u->iz(0, i, j, k); u->iz(0, i, j, k) = rh;
         u->iz(1, i, j, k) = rh*u->iz(1, i, j, k); u->iz(2, i, j, k) = rh*u->iz(2, i, j, k); u->iz(3, i, j, k) = rh*u->iz(3, i, j, k);
 
         u->iz(4, i, j, k) = u->iz(4, i, j, k)/(gamma-1) + rh*v2/2.0;
@@ -130,9 +130,9 @@ bool toConserved(Arrays *u, int dim, int i, int j, int k, long double gamma) {
 
 
 
-bool F(long double uP[8], long double uC[8], long double *flux) {
-    long double v = sqrtl(SQ(uP[1])+SQ(uP[2])+SQ(uP[3]));
-    long double Pstar = uP[4];
+bool F(ld uP[8], ld uC[8], ld *flux) {
+    ld v = sqrtl(SQ(uP[1])+SQ(uP[2])+SQ(uP[3]));
+    ld Pstar = uP[4];
 
     flux[0] = uC[1];
     flux[1] = uC[1]*uP[1] + Pstar;
@@ -143,9 +143,9 @@ bool F(long double uP[8], long double uC[8], long double *flux) {
     return true;
 }
 
-bool G(long double uP[8], long double uC[8], long double *flux) {
-    long double v = sqrtl(SQ(uP[1])+SQ(uP[2])+SQ(uP[3]));
-    long double Pstar = uP[4];
+bool G(ld uP[8], ld uC[8], ld *flux) {
+    ld v = sqrtl(SQ(uP[1])+SQ(uP[2])+SQ(uP[3]));
+    ld Pstar = uP[4];
 
     flux[0] = uC[2];
     flux[1] = uC[2]*uP[1];
@@ -156,9 +156,9 @@ bool G(long double uP[8], long double uC[8], long double *flux) {
     return true;
 }
 
-bool H(long double uP[8], long double uC[8], long double *flux) {
-    long double v = sqrtl(SQ(uP[1])+SQ(uP[2])+SQ(uP[3]));
-    long double Pstar = uP[4];
+bool H(ld uP[8], ld uC[8], ld *flux) {
+    ld v = sqrtl(SQ(uP[1])+SQ(uP[2])+SQ(uP[3]));
+    ld Pstar = uP[4];
 
     flux[0] = uC[3];
     flux[1] = uC[3]*uP[1];
@@ -171,13 +171,13 @@ bool H(long double uP[8], long double uC[8], long double *flux) {
 
 
 #ifndef ISO
-void getWavespeeds(Arrays *u, int i, int j, int k, long double gamma, long double *wvx, long double *wvy, long double *wvz) {
+void getWavespeeds(Arrays *u, int i, int j, int k, ld gamma, ld *wvx, ld *wvy, ld *wvz) {
 
-    long double v = sqrtl(SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k)));
+    ld v = sqrtl(SQ(u->uP(1, i, j, k))+SQ(u->uP(2, i, j, k))+SQ(u->uP(3, i, j, k)));
 
 
-    long double rh = u->uC(0, i, j, k); if (rh <= 0) { cout << "ERROR:::AdiabHD.h::getWavespeeds:: The density is null or negative !" << endl; return; }
-    long double a = sqrtl(gamma*u->uP(4, i, j, k)/rh);
+    ld rh = u->uC(0, i, j, k); if (rh <= 0) { cout << "ERROR:::AdiabHD.h::getWavespeeds:: The density is null or negative !" << endl; return; }
+    ld a = sqrtl(gamma*u->uP(4, i, j, k)/rh);
 
     if (isnan(a)) {
         cout << "ERROR:::AdiabHD.h::getWavespeeds:: a is NaN" << endl;
@@ -197,14 +197,14 @@ void getWavespeeds(Arrays *u, int i, int j, int k, long double gamma, long doubl
 
 }
 
-void getWavespeeds(long double *w, long double gamma, long double *wvn) {
+void getWavespeeds(ld *w, ld gamma, ld *wvn) {
 
     /* Order: (rho, vn, v1, v2, P) */
-    long double v = sqrtl(SQ(w[1])+SQ(w[2])+SQ(w[3]));
+    ld v = sqrtl(SQ(w[1])+SQ(w[2])+SQ(w[3]));
 
 
-    long double rh = w[0]; if (rh <= 0) { cout << "ERROR:::AdiabHD.h::getWavespeeds:: The density is null or negative !" << endl; return; }
-    long double a = sqrtl(gamma*w[4]/rh);
+    ld rh = w[0]; if (rh <= 0) { cout << "ERROR:::AdiabHD.h::getWavespeeds:: The density is null or negative !" << endl; return; }
+    ld a = sqrtl(gamma*w[4]/rh);
 
     if (isnan(a)) {
         cout << "ERROR:::AdiabHD.h::getWavespeeds:: a is NaN" << endl;
@@ -215,6 +215,28 @@ void getWavespeeds(long double *w, long double gamma, long double *wvn) {
     wvn[1] = 0.0;
 
 }
+
+ld maxWavespeed(ld *w, ld gamma) {
+
+    /* Order: (rho, vn, v1, v2, P) */
+    return sqrtl(gamma*w[4]/w[0]);
+}
 #endif // !ISO
 
 
+
+
+
+void minmaxRoeEigenvalue(ld *uL, ld *wL, ld *uR, ld *wR, ld gamma, ld *l) {
+    //ld rho = sqrtl(wL[0])*sqrtl(wR[0]);
+    ld vx = ( sqrtl(wL[0])*wL[1] + sqrtl(wR[0])*wR[1] ) / (sqrtl(wL[0])+sqrtl(wR[0]));
+    ld vy = ( sqrtl(wL[0])*wL[2] + sqrtl(wR[0])*wR[2] ) / (sqrtl(wL[0])+sqrtl(wR[0]));
+    ld vz = ( sqrtl(wL[0])*wL[3] + sqrtl(wR[0])*wR[3] ) / (sqrtl(wL[0])+sqrtl(wR[0]));
+    ld v2 = vx*vx + vy*vy + vz*vz;
+
+    ld HL = (uL[4]+wL[4])/wL[0];   ld HR = (uR[4]+wR[4])/wR[0];
+    ld H = ( sqrtl(wL[0])*HL + sqrtl(wR[0])*HR ) / (sqrtl(wL[0])+sqrtl(wR[0]));
+    ld a = sqrtl((gamma-1)*(H-v2/2));
+    l[0] = vx - a;
+    l[1] = vx + a;
+}

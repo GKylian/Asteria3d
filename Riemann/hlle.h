@@ -2,19 +2,20 @@
 #include "../Defs/Arrays.h"
 #include "../prob.h"
 
-bool hlle(long double *uL, long double *wL, long double *uR, long double *wR, long double *FL, long double *FR, long double *F, long double SL, long double SR);
+bool hlle(ld *uL, ld *wL, ld *uR, ld *wR, ld *FL, ld *FR, ld *F, ld SL, ld SR);
 
 bool getFluxes(Arrays *u, int i, int j, int k) {
 	int iBx = NVAL-3; int iBy = NVAL-2; int iBz = NVAL-1;
+	ld gamma = u->gamma;
 
-	long double cL[WV] = { 0 }; long double cR[WV] = { 0 };
+	ld cL[WV] = { 0 }; ld cR[WV] = { 0 };
 	int iR = i*2; int iL = i*2-1; int jR = j*2; int jL = j*2-1; int kR = k*2; int kL = k*2-1;
-	long double FL[NVAL] = { 0 }; long double FR[NVAL] = { 0 }; long double Fs[NVAL] = { 0 };
+	ld FL[NVAL] = { 0 }; ld FR[NVAL] = { 0 }; ld Fs[NVAL] = { 0 };
 
 	if (u->Nx > 1) {
 		 
 		/* ----- 0. Load values into arrays ----- */
-		long double uL[NVAL] = { 0 }; long double uR[NVAL] = { 0 }; long double wL[NVAL] = { 0 }; long double wR[NVAL] = { 0 };
+		ld uL[NVAL] = { 0 }; ld uR[NVAL] = { 0 }; ld wL[NVAL] = { 0 }; ld wR[NVAL] = { 0 };
 		for (int n = 0; n < NVAL; n++) {    uL[n] = u->ix(n, iL, j, k); uR[n] = u->ix(n, iR, j, k);    }
 		/* Order: (rho, Mn, M1, M2, E, Bn, B1, B2) */
 
@@ -24,16 +25,18 @@ bool getFluxes(Arrays *u, int i, int j, int k) {
 
 
 
-		/* ----- 1. Get wavespeeds ----- */
-		getWavespeeds(wL, gamma, cL); getWavespeeds(wR, gamma, cR);
-		long double CL = (long double)*std::max_element(cL, cL+WV); long double CR = (long double)*std::max_element(cR, cR+WV);
+		/* ----- 1. Get wavespeeds and max/min Roe eigenvalues ----- */
+		ld CL = maxWavespeed(wL, gamma);   ld CR = maxWavespeed(wR, gamma);
+		ld l[2] = { 0 }; minmaxRoeEigenvalue(uL, wL, uR, wR, gamma, l);
 
 
 		/* ----- 2. Compute left and right signal speeds ----- */
-		long double SL = fminl(wL[1], wR[1]) - fmaxl(CL, CR);
-		long double SR = fmaxl(wL[1], wR[1]) + fmaxl(CL, CR);
+		/*ld SL = fminl(wL[1], wR[1]) - fmaxl(CL, CR);
+		ld SR = fmaxl(wL[1], wR[1]) + fmaxl(CL, CR);*/
+		ld SL = fminl(l[0], wL[1]-CL);   ld SR = fmaxl(l[1], wR[1]+CR);
 
-		//long double bmin = fminl(SL, 0); long double bplus = fmaxl(SR, 0);
+
+		//ld bmin = fminl(SL, 0); ld bplus = fmaxl(SR, 0);
 
 		/* ----- 3. Compute left/right interfaces fluxes ----- */
 		F(wL, uL, FL); F(wR, uR, FR);
@@ -64,10 +67,12 @@ bool getFluxes(Arrays *u, int i, int j, int k) {
 		for (int n = 0; n < NVAL; n++)
 			u->Fx(n, i, j, k) = Fs[n];
 	}
+
+
 	if (u->Ny > 1) {
 
 		/* ----- 0. Load values into arrays ----- */
-		long double uL[NVAL] = { 0 }; long double uR[NVAL] = { 0 }; long double wL[NVAL] = { 0 }; long double wR[NVAL] = { 0 };
+		ld uL[NVAL] = { 0 }; ld uR[NVAL] = { 0 }; ld wL[NVAL] = { 0 }; ld wR[NVAL] = { 0 };
 		for (int n = 0; n < NVAL; n++) { uL[n] = u->iy(n, i, jL, k); uR[n] = u->iy(n, i, jR, k); }
 
 		/* Order: (vx, vy, vz) -> (vy, vx, vz) */
@@ -81,14 +86,16 @@ bool getFluxes(Arrays *u, int i, int j, int k) {
 		if (!toPrimitive(uR, wR, gamma)) { std::cout << "ERROR:::hlle.h::getFluxes:: Could not transform uR to wR." << std::endl; return false; }
 
 
-		/* ----- 1. Get wavespeeds ----- */
-		getWavespeeds(wL, gamma, cL); getWavespeeds(wR, gamma, cR);
-		long double CL = (long double)*std::max_element(cL, cL+WV); long double CR = (long double)*std::max_element(cR, cR+WV);
+		/* ----- 1. Get wavespeeds and max/min Roe eigenvalues ----- */
+		ld CL = maxWavespeed(wL, gamma);   ld CR = maxWavespeed(wR, gamma);
+		ld l[2] = { 0 }; minmaxRoeEigenvalue(uL, wL, uR, wR, gamma, l);
 
 
 		/* ----- 2. Compute left and right signal speeds ----- */
-		long double SL = fminl(wL[1], wR[1]) - fmaxl(CL, CR);
-		long double SR = fmaxl(wL[1], wR[1]) + fmaxl(CL, CR);
+		/*ld SL = fminl(wL[1], wR[1]) - fmaxl(CL, CR);
+		ld SR = fmaxl(wL[1], wR[1]) + fmaxl(CL, CR);*/
+		ld SL = fminl(l[0], wL[1]-CL);   ld SR = fmaxl(l[1], wR[1]+CR);
+
 
 		/* ----- 3. Compute left/right interfaces fluxes ----- */
 		F(wL, uL, FL); F(wR, uR, FR);
@@ -104,16 +111,18 @@ bool getFluxes(Arrays *u, int i, int j, int k) {
 		swap(Fs[iBx], Fs[iBy]);
 #endif // MHD
 
-
+		//TODO:cout << "\t" << Fs[iBy] << endl;
 		/* ----- 5. Transfer the fluxes to the arrays ----- */
 		for (int n = 0; n < NVAL; n++)
 			u->Fy(n, i, j, k) = Fs[n];
 
 	}
+
+
 	if (u->Nz > 1) {
 
 		/* ----- 0. Load values into arrays ----- */
-		long double uL[NVAL] = { 0 }; long double uR[NVAL] = { 0 }; long double wL[NVAL] = { 0 }; long double wR[NVAL] = { 0 };
+		ld uL[NVAL] = { 0 }; ld uR[NVAL] = { 0 }; ld wL[NVAL] = { 0 }; ld wR[NVAL] = { 0 };
 		for (int n = 0; n < NVAL; n++) { uL[n] = u->iz(n, i, j, kL); uR[n] = u->iz(n, i, j, kR); }
 
 		/* Order: (vx, vy, vz) -> (vz, vx, vy) */
@@ -127,14 +136,16 @@ bool getFluxes(Arrays *u, int i, int j, int k) {
 		if (!toPrimitive(uR, wR, gamma)) { std::cout << "ERROR:::hlle.h::getFluxes:: Could not transform uR to wR." << std::endl; return false; }
 
 
-		/* ----- 1. Get wavespeeds ----- */
-		getWavespeeds(wL, gamma, cL); getWavespeeds(wR, gamma, cR);
-		long double CL = (long double)*std::max_element(cL, cL+WV); long double CR = (long double)*std::max_element(cR, cR+WV);
+		/* ----- 1. Get wavespeeds and max/min Roe eigenvalues ----- */
+		ld CL = maxWavespeed(wL, gamma);   ld CR = maxWavespeed(wR, gamma);
+		ld l[2] = { 0 }; minmaxRoeEigenvalue(uL, wL, uR, wR, gamma, l);
 
 
 		/* ----- 2. Compute left and right signal speeds ----- */
-		long double SL = fminl(wL[1], wR[1]) - fmaxl(CL, CR);
-		long double SR = fmaxl(wL[1], wR[1]) + fmaxl(CL, CR);
+		/*ld SL = fminl(wL[1], wR[1]) - fmaxl(CL, CR);
+		ld SR = fmaxl(wL[1], wR[1]) + fmaxl(CL, CR);*/
+		ld SL = fminl(l[0], wL[1]-CL);   ld SR = fmaxl(l[1], wR[1]+CR);
+
 
 		/* ----- 3. Compute left/right interfaces fluxes ----- */
 		F(wL, uL, FL); F(wR, uR, FR);
@@ -163,7 +174,7 @@ bool getFluxes(Arrays *u, int i, int j, int k) {
 
 
 
-bool hlle(long double *uL, long double *wL, long double *uR, long double *wR, long double *FL, long double *FR, long double *F, long double SL, long double SR) {
+bool hlle(ld *uL, ld *wL, ld *uR, ld *wR, ld *FL, ld *FR, ld *F, ld SL, ld SR) {
 
 	if (SL > 0.0) {
 		for (int n = 0; n < NVAL; n++) 
@@ -171,7 +182,7 @@ bool hlle(long double *uL, long double *wL, long double *uR, long double *wR, lo
 	}
 	if (SL <= 0.0 && SR >= 0.0) {
 		for (int n = 0; n < NVAL; n++)
-			F[n] = (SR*FL[n] - SL*FR[n] + SR*SL*(uR[n]-uL[n])) / (SR-SL); //F[i] = (SR*FL[i] - SL*FR[i] + SR*SL*(uR[i]-uL[i])) / (SR-SL);
+			F[n] = (SR*FL[n] - SL*FR[n] + SR*SL*(uR[n]-uL[n])) / (SR-SL);
 	}
 	if (SR < 0.0) {
 		for (int n = 0; n < NVAL; n++)

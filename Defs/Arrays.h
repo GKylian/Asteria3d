@@ -78,29 +78,30 @@ private:
 struct Arrays
 {
 	//rho, Mx, My, Mz, E, Bx, By, Bz
-	Array<long double> cons[NVAL]; /*  rho, Mx, My, Mz, E, Bx, By, Bz   OR   rho, Mx, My, Mz, cs, Bx, By, Bz  */
+	Array<ld> cons[NVAL]; /*  rho, Mx, My, Mz, E, Bx, By, Bz   OR   rho, Mx, My, Mz, cs, Bx, By, Bz  */
 								   /*  rho, Mx, My, Mz, E               OR   rho, Mx, My, Mz, cs              */
 
-	Array<long double> prim[NVAL];
+	Array<ld> prim[NVAL];
 	//tex: $\vec{v} \to \vec{M}, E \to P$, and $\vec{B}$ are stored at cell centers
 
 	//The three interface arrays
-	Array<long double> intx[NVAL];
-	Array<long double> inty[NVAL];
-	Array<long double> intz[NVAL];
+	Array<ld> intx[NVAL];
+	Array<ld> inty[NVAL];
+	Array<ld> intz[NVAL];
 
 	//The three fluxes arrays.
-	Array<long double> F_x[NVAL];
-	Array<long double> F_y[NVAL];
-	Array<long double> F_z[NVAL];
+	Array<ld> F_x[NVAL];
+	Array<ld> F_y[NVAL];
+	Array<ld> F_z[NVAL];
 
 	
 	
 	int Nx, Ny, Nz = 0; int dim = 0;
-	long double dx, dy, dz = 0;
-	long double x0, xn, y0, yn, z0, zn = 0.0;
+	ld dx, dy, dz = 0;
+	ld x0, xn, y0, yn, z0, zn = 0.0;
 	bounds boundaries[6]; /* xin, xout, yin, yout, zin, zout */
-	long double t; long double dt; int s;
+	ld t; ld dt; int s; ld tn = 1.0;
+	ld gamma = 1.4;
 
 
 	//dl/dr: first/last cell of the whole domain	gl/gr: last/first ghost cell	cl/cr: first/last cell of the computation domain
@@ -129,7 +130,7 @@ struct Arrays
 			//cout << "F_x[" << i << "] array size: "; F_x[i].printSize(); cout << endl;
 			//cout << "--> should be " << (Nx>1)*(Nx+2*NGHOST)+1 << ", " << Ny+(Ny>1)*2*NGHOST << ", " << Nz+(Nz>1)*2*NGHOST << endl;
 			F_y[i].setSize(Nx+(Nx>1)*2*NGHOST, (Ny>1)*(Ny+2*NGHOST)+1, Nz+(Nz>1)*2*NGHOST);
-			cout << "F_y[" << i << "] array size: "; F_y[i].printSize(); cout << endl;
+			//cout << "F_y[" << i << "] array size: "; F_y[i].printSize(); cout << endl;
 			F_z[i].setSize(Nx+(Nx>1)*2*NGHOST, Ny+(Ny>1)*2*NGHOST, (Nz>1)*(Nz+2*NGHOST)+1);
 			//cout << "F_z[" << i << "] array size: "; F_z[i].printSize(); cout << endl;
 		}
@@ -137,66 +138,76 @@ struct Arrays
 		dim = (nx > 1)+(ny > 1)+(nz > 1);
 	}
 
-	void seth(long double _dx, long double _dy) {
+	void initAll() {
+		initAll(Nx, Ny, Nz);
+	}
+
+	void seth(ld _dx, ld _dy) {
 		dx = _dx; dy = _dy;
 	}
 
-	void setRange(long double _x0, long double _xn, long double _y0, long double _yn) {
+	void setRange(ld _x0, ld _xn, ld _y0, ld _yn) {
 		x0 = _x0; xn = _xn; y0 = _y0; yn = _yn;
 	}
 
-	void seth(long double _dx, long double _dy, long double _dz) {
+	void seth(ld _dx, ld _dy, ld _dz) {
 		dx = _dx; dy = _dy; dz = _dz;
 	}
 
-	void setRange(long double _x0, long double _xn, long double _y0, long double _yn, long double _z0, long double _zn) {
+	void seth() {
+		dx = (xn-x0)/(Nx-1.0); if (Nx <= 1) dx = 1.0;
+		dy = (yn-y0)/(Ny-1.0); if (Ny <= 1) dy = 1.0;
+		dz = (zn-z0)/(Nz-1.0); if (Nz <= 1) dz = 1.0;
+	}
+
+	void setRange(ld _x0, ld _xn, ld _y0, ld _yn, ld _z0, ld _zn) {
 		x0 = _x0; xn = _xn; y0 = _y0; yn = _yn; z0 = _z0; zn = _zn;
 	}
 
-	long double &uC(int i, int xi, int yi) {
+	ld &uC(int i, int xi, int yi) {
 		return cons[i].get(xi, yi);
 	}
-	long double &uC(int i, int xi, int yi, int zi) {
+	ld &uC(int i, int xi, int yi, int zi) {
 		return cons[i].get(xi, yi, zi);
 	}
-	Array<long double> &getC(int i) {
+	Array<ld> &getC(int i) {
 		return cons[i];
 	}
-	long double &uP(int i, int xi, int yi) {
+	ld &uP(int i, int xi, int yi) {
 		return prim[i].get(xi, yi);
 	}
-	long double &uP(int i, int xi, int yi, int zi) {
+	ld &uP(int i, int xi, int yi, int zi) {
 		return prim[i].get(xi, yi, zi);
 	}
-	Array<long double> &getP(int i) {
+	Array<ld> &getP(int i) {
 		return prim[i];
 	}
 
-	long double &ix(int i, int xi, int yi, int zi) {
+	ld &ix(int i, int xi, int yi, int zi) {
 		return intx[i].get(xi, yi, zi);
 	}
-	long double &iy(int i, int xi, int yi, int zi) {
+	ld &iy(int i, int xi, int yi, int zi) {
 		return inty[i].get(xi, yi, zi);
 	}
-	long double &iz(int i, int xi, int yi, int zi) {
+	ld &iz(int i, int xi, int yi, int zi) {
 		return intz[i].get(xi, yi, zi);
 	}
 
-	long double &Fx(int i, int xi, int yi, int zi) {
+	ld &Fx(int i, int xi, int yi, int zi) {
 		if (xi > i_dr || yi > j_dr || zi > k_dr) cout << "ERROR:::Arrays.h::Fx:: Out of bound: " << xi << ", " << yi << ", " << zi << endl;
 		return F_x[i].get(xi, yi, zi);
 	}
-	long double &Fy(int i, int xi, int yi, int zi) {
+	ld &Fy(int i, int xi, int yi, int zi) {
 		if (xi > i_dr || yi > j_dr || zi > k_dr) cout << "ERROR:::Arrays.h::Fy:: Out of bound: " << xi << ", " << yi << ", " << zi << endl;
 		return F_y[i].get(xi, yi, zi);
 	}
-	long double &Fz(int i, int xi, int yi, int zi) {
+	ld &Fz(int i, int xi, int yi, int zi) {
 		if (xi > i_dr || yi > j_dr || zi > k_dr) cout << "ERROR:::Arrays.h::Fz:: Out of bound: " << xi << ", " << yi << ", " << zi << endl;
 		return F_z[i].get(xi, yi, zi);
 	}
 
 
-	void pos(long double *x, int i, int j, int k) {
+	void pos(ld *x, int i, int j, int k) {
 		x[0] = x0+(i-i_cl)*dx;
 		x[1] = y0+(j-j_cl)*dy;
 		x[2] = z0+(k-k_cl)*dz;

@@ -8,7 +8,7 @@
 
 
 /* Get eigenvalues for isometric MHD system */
-void getEigen(long double *w, long double *eigen, long double L[][NWAVE], long double R[][NWAVE]) {
+void getEigen(ld *w, ld *eigen, ld L[][NWAVE], ld R[][NWAVE]) {
 
 }
  
@@ -17,12 +17,12 @@ void getEigen(long double *w, long double *eigen, long double L[][NWAVE], long d
 #else // Not ISO //
 
 /* Get eigenvalues for adiabatic MHD system */
-bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long double R[][NWAVE]) {
+bool getEigen(ld *w, ld *eigen, ld L[][NWAVE], ld R[][NWAVE], ld gamma) {
 
     //0) Shortcuts for the variables.
-    long double rh = w[0]; long double vn = w[1]; long double P = w[4]; long double rtrh = sqrtl(rh);
-    long double B1 = w[5]; long double B2 = w[6]; long double Bn = w[7];
-    long double b1 = B1/rtrh; long double b2 = B2/rtrh; long double bn = b1/rtrh;
+    ld rh = w[0]; ld vn = w[1]; ld P = w[4]; ld rtrh = sqrtl(rh);
+    ld B1 = w[5]; ld B2 = w[6]; ld Bn = w[7];
+    ld b1 = B1/rtrh; ld b2 = B2/rtrh; ld bn = b1/rtrh;
 
     if (rh <= 0) {
         cout << "Density is null or negative: " << rh << endl; return false;
@@ -33,19 +33,19 @@ bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long d
     
 
     //1) Compute some reused values.
-    long double Sn = Sgn(Bn);
+    ld Sn = Sgn(Bn);
 
-    long double a2 = gamma*P/rh; long double a = sqrtl(a2); if (isnan(a)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed a is NaN: a2 = " << a2 << endl;
-    long double CAn2 = Bn*Bn/rh; long double CAn = sqrtl(CAn2); if (isnan(CAn)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed CAn is NaN: CAn2 = " << CAn2 << endl;
-    long double CA2 = (Bn*Bn+B1*B1+B2*B2)/rh; long double CA = sqrtl(CA2); if (isnan(CA)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed CA is NaN: CA2 = " << CA2 << endl;
-    long double Cf2 = 0.5*(  (a2+CA2) + sqrtl(powl(a2+CA2, 2) - 4*a2*CAn2)  ); long double Cf = sqrtl(Cf2); if (isnan(Cf)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed Cf is NaN: Cf2 = " << Cf2 << endl;
-    long double Cs2 = 0.5*(  (a2+CA2) - sqrtl(powl(a2+CA2, 2) - 4*a2*CAn2)  ); long double Cs = sqrtl(Cs2); if (isnan(Cs)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed Cs is NaN: Cs2 = " << Cs2 << endl;
+    ld a2 = gamma*P/rh; ld a = sqrtl(a2); if (isnan(a)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed a is NaN: a2 = " << a2 << endl;
+    ld CAn2 = Bn*Bn/rh; ld CAn = sqrtl(CAn2); if (isnan(CAn)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed CAn is NaN: CAn2 = " << CAn2 << endl;
+    ld CA2 = (Bn*Bn+B1*B1+B2*B2)/rh; ld CA = sqrtl(CA2); if (isnan(CA)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed CA is NaN: CA2 = " << CA2 << endl;
+    ld Cf2 = 0.5*(  (a2+CA2) + sqrtl(powl(a2+CA2, 2) - 4*a2*CAn2)  ); ld Cf = sqrtl(Cf2); if (isnan(Cf)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed Cf is NaN: Cf2 = " << Cf2 << endl;
+    ld Cs2 = 0.5*(  (a2+CA2) - sqrtl(powl(a2+CA2, 2) - 4*a2*CAn2)  ); ld Cs = sqrtl(Cs2); if (isnan(Cs)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed Cs is NaN: Cs2 = " << Cs2 << endl;
 
-    long double alf = sqrtl((a2 - Cs2)/(Cf2 - Cs2)); long double als = sqrtl((Cf2 - a2)/(Cf2 - Cs2));
+    ld alf = sqrtl((a2 - Cs2)/(Cf2 - Cs2)); ld als = sqrtl((Cf2 - a2)/(Cf2 - Cs2));
     //cout << alf*alf+als*als-1.0 << endl;
 
-    long double Bperp = sqrtl(B1*B1+B2*B2); long double bperp = Bperp/rtrh;
-    long double beta1 = B1/Bperp; long double beta2 = B2/Bperp;
+    ld Bperp = sqrtl(B1*B1+B2*B2); ld bperp = Bperp/rtrh;
+    ld beta1 = B1/Bperp; ld beta2 = B2/Bperp;
 
     if (null(Bperp) && !null(Bn)) {
         beta1 = 1.0/sqrtl(2.0); beta2 = 1.0/sqrtl(2.0);
@@ -79,7 +79,7 @@ bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long d
 
     if (null(fabsl(bn)-a) && null(Bperp)) { //magnetosonic case
         Cf2 = a2; Cf = a; Cs2 = a2; Cs = a;
-        long double phi = atanl( Bperp/(fabsl(bn)-a) );
+        ld phi = atanl( Bperp/(fabsl(bn)-a) );
         //alf = sinl(phi/2.0) + 
         cout << "Magnetosonic case" << endl;
     }
@@ -98,10 +98,10 @@ bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long d
         cout << "B(Bn, B1, B2) = " << Bn << ", " << B1 << ", " << B2 << endl;
     }
 
-    long double Cff = Cf*alf; long double Css = Cs*als; if (isnan(Cff)) cout << "NaN:::eigen.h::getEigen:: Cff is NaN !" << endl;   if (isnan(Css)) cout << "NaN:::eigen.h::getEigen:: Css is NaN !" << endl;
-    long double Qf = Cf*alf*Sn; long double Qs = Cs*als*Sn; if (isnan(Qf)) cout << "NaN:::eigen.h::getEigen:: Qf is NaN !" << endl;   if (isnan(Qs)) cout << "NaN:::eigen.h::getEigen:: Qs is NaN !" << endl;
-    long double Af = a*alf*rtrh; long double As = a*als*rtrh; if (isnan(Af)) cout << "NaN:::eigen.h::getEigen:: Af is NaN !" << endl;   if (isnan(As)) cout << "NaN:::eigen.h::getEigen:: Af is NaN !" << endl;
-    long double N = 0.5/a2; if (isnan(N)) cout << "NaN:::eigen.h::getEigen:: a is NaN,   a2 = " << a2 << endl;
+    ld Cff = Cf*alf; ld Css = Cs*als; if (isnan(Cff)) cout << "NaN:::eigen.h::getEigen:: Cff is NaN !" << endl;   if (isnan(Css)) cout << "NaN:::eigen.h::getEigen:: Css is NaN !" << endl;
+    ld Qf = Cf*alf*Sn; ld Qs = Cs*als*Sn; if (isnan(Qf)) cout << "NaN:::eigen.h::getEigen:: Qf is NaN !" << endl;   if (isnan(Qs)) cout << "NaN:::eigen.h::getEigen:: Qs is NaN !" << endl;
+    ld Af = a*alf*rtrh; ld As = a*als*rtrh; if (isnan(Af)) cout << "NaN:::eigen.h::getEigen:: Af is NaN !" << endl;   if (isnan(As)) cout << "NaN:::eigen.h::getEigen:: Af is NaN !" << endl;
+    ld N = 0.5/a2; if (isnan(N)) cout << "NaN:::eigen.h::getEigen:: a is NaN,   a2 = " << a2 << endl;
 
 
     //2) Compute the eigenvalues
@@ -175,15 +175,15 @@ void getEigen() {
 #else // Not ISO //
 
 /* Get eigenvalues for adiabatic HD system */
-bool getEigen(long double *w, long double *eigen, long double L[][NWAVE], long double R[][NWAVE]) {
-    long double rh = w[0];  long double vn = w[1];  long double P = w[4];
+bool getEigen(ld *w, ld *eigen, ld L[][NWAVE], ld R[][NWAVE], ld gamma) {
+    ld rh = w[0];  ld vn = w[1];  ld P = w[4];
     if (rh <= 0) {
         cout << "RANGE-ERROR::getEigenHD:: rho <= 0" << endl; return false;
     }
     if (P <= 1e-6) {
         cout << "RANGE-ERROR::getEigenHD:: P <= 1e-6" << endl; return false;
     }
-    long double a2 = gamma*P/rh; long double a = sqrtl(a2);
+    ld a2 = gamma*P/rh; ld a = sqrtl(a2);
 
     eigen[0] = vn - a;
     eigen[1] = vn; eigen[2] = vn; eigen[3] = vn;

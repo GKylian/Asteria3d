@@ -216,21 +216,6 @@ bool check(Arrays *u){
 		if(u->uP(4, i, j, k) <= 0) { std::cout << "check:: P at (" << i << ", " << j << ", " << k << ") is null or negative: " << u->uP(4, i, j, k) << std::endl; return false; }
 	}
 
-	//TODO: Remove this when I figured out what's causing the difference...
-	/* Check that the cell-centered average of B in uP is correct */
-	/*for(int k = u->k_cl; k <= u->k_cr; k++)
-	for(int j = u->j_cl; j <= u->j_cr; j++)
-	for(int i = u->i_cl; i <= u->i_cr; i++)
-	{
-		if (0.5*(u->uC(5, i, j, k)+u->uC(5, i+1, j, k)) != u->uP(5, i, j, k)) {
-			std::cout << "\tcheck:: The cell-centered value of Bx in uP is not correct: " << u->uP(5, i, j, k) << " but should be " << 0.5*(u->uC(5, i, j, k)+u->uC(5, i+1, j, k)) << std::endl;
-			return false;
-		}
-		if (0.5*(u->uC(6, i, j, k)+u->uC(6, i, j+1, k)) != u->uP(6, i, j, k)) {
-			std::cout << "\tcheck:: The cell-centered value of By in uP is not correct: " << u->uP(6, i, j, k) << " but should be " << 0.5*(u->uC(6, i, j, k)+u->uC(6, i, j+1, k)) << std::endl;
-			return false;
-		}
-	}*/
 	return true;
 }
 

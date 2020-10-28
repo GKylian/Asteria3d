@@ -16,9 +16,8 @@
     #include "Eq/AdiabHD.h" 
   #endif // !ISO
 #endif // MHD
-#include "primBounds.h"
 
-#define PNAME "rtinstability"
+#define PNAME "currentsheet"
 
 /*
 <->
@@ -70,12 +69,7 @@ ld Phii(Arrays *u, int i, int j, int k) {
 
 bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fname);
 bool DoInLoop(Arrays *u);
-bool ApplyBounds(Arrays *u);
-
-void RTreflect_yin(Arrays *u);
-void RTreflect_yout(Arrays *u);
-
-
+bool check(Arrays *u);
 
 
 bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fname) {
@@ -94,12 +88,10 @@ bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fna
 
 	u->gamma = stod((*params)["problem"]["gamma"]); ld gamma = u->gamma;
 
-	ld rhoIn = stod((*params)["problem"]["rhoIn"]);
-	ld rhoOut = stod((*params)["problem"]["rhoOut"]);
-	ld PIn = stod((*params)["problem"]["PIn"]);
-	ld POut = stod((*params)["problem"]["POut"]);
-
-	ld radius = stod((*params)["problem"]["radius"]);
+	ld rho0 = stod((*params)["problem"]["rho0"]);
+	ld P0 = stod((*params)["problem"]["P0"]);
+	ld B0 = stod((*params)["problem"]["B0"]);
+	ld v0 = stod((*params)["problem"]["v0"]);
 	
 
 	/* Create the arrays */
@@ -117,30 +109,32 @@ bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fna
 		ld x = u->x0 + u->dx*(i-NGHOST);
 		ld y = u->y0 + u->dy*(j-NGHOST);
 		ld z = u->z0 + u->dz*(k-NGHOST);
-		ld r = sqrtl(x*x+y*y);
 
 		/* Cell interface coordinates */
 		ld ix = x - 0.5*u->dx; ld iy = y - 0.5*u->dy; ld iz = z - 0.5*u->dz;
 
 		/* Set HD variables as primitive variables */
+		u->uP(0, i, j, k) = rho0; u->uP(4, i, j, k) = P0;
+		u->uP(1, i, j, k) = v0*sinl(2*M_PI*y); u->uP(2, i, j, k) = 0.0; u->uP(3, i, j, k) = 0.0;
 		
-		if (r < radius) {
-			u->uP(0, i, j, k) = rhoIn;
-			u->uP(4, i, j, k) = PIn;
-		}
-		else {
-			u->uP(0, i, j, k) = rhoOut;
-			u->uP(4, i, j, k) = POut;
-		}
-			
+		
 
-		u->uP(1, i, j, k) = 0.0; u->uP(2, i, j, k) = 0.0; u->uP(3, i, j, k) = 0.0;
-		
 #ifdef MHD
-		u->uC(5, i, j, k) = 1.0/sqrtl(2.0); u->uC(6, i, j, k) = 1.0/sqrtl(2.0); u->uC(7, i, j, k) = 0.0;
+		/* Compute potential at cell corners */
+
+
+		ld xc = u->x0 + u->dx*(i-NGHOST-0.5);// ld yc = u->y0 + u->dy*(j-NGHOST-0.5);
+		u->uC(5, i, j, k) = 0.0; u->uC(7, i, j, k) = 0.0;
+		if(xc >= 0.0 && xc < 0.5)
+			u->uC(6, i, j, k) = B0;
+		if (xc >= 0.5 && xc < 1.5)
+			u->uC(6, i, j, k) = -B0;
+		if (xc >= 1.5 && xc <= 2.0)
+			u->uC(6, i, j, k) = B0;
+
+
+
 #endif // MHD
-
-
 	}
 	cout << "problem():: Initialized the variables" << endl;
 
@@ -234,7 +228,6 @@ bool check(Arrays *u){
 	return true;
 }
 
-
 bool ApplyBounds(Arrays *u) {
 	if (u->Nx > 1 && u->boundaries[0] != bounds::USER) bounds_xin(u);
 	if (u->Nx > 1 && u->boundaries[1] != bounds::USER) bounds_xout(u);
@@ -260,10 +253,3 @@ bool ApplyBounds(Arrays *u) {
 
 	return true;
 }
-
-
-
-
-
-
-/* ---------- Custom Boundary functions (if any) ---------- */

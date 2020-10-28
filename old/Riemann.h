@@ -3,10 +3,10 @@
 #include <iostream>
 
 
-bool X_HLLFlux(long double uL[8], long double uR[8], long double SL, long double SR, long double FL[8], long double FR[8], long double *F) {
+bool X_HLLFlux(ld uL[8], ld uR[8], ld SL, ld SR, ld FL[8], ld FR[8], ld *F) {
 
     //1. Get primitive variables and compute intermediate speed
-    //long double wL[8] = { 0 }; if (!toPrimitive(uL, wL)) return false; long double wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
+    //ld wL[8] = { 0 }; if (!toPrimitive(uL, wL)) return false; ld wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
     
 
     //3. Choose which intermediate flux to return
@@ -30,10 +30,10 @@ bool X_HLLFlux(long double uL[8], long double uR[8], long double SL, long double
     return false;
 }
 
-bool Y_HLLFlux(long double uL[8], long double uR[8], long double SL, long double SR, long double GL[8], long double GR[8], long double *G) {
+bool Y_HLLFlux(ld uL[8], ld uR[8], ld SL, ld SR, ld GL[8], ld GR[8], ld *G) {
 
     //1. Get primitive variables and compute intermediate speed
-    //long double wL[8] = { 0 }; if (!toPrimitive(uL, wL)) return false; long double wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
+    //ld wL[8] = { 0 }; if (!toPrimitive(uL, wL)) return false; ld wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
     
 
     //3. Choose which intermediate flux to return
@@ -68,21 +68,21 @@ bool Y_HLLFlux(long double uL[8], long double uR[8], long double SL, long double
 //TODO:---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-bool X_HLLCFlux(long double uL[8], long double uR[8], long double SL, long double SR, long double FL[8], long double FR[8], long double *F) {
+bool X_HLLCFlux(ld uL[8], ld uR[8], ld SL, ld SR, ld FL[8], ld FR[8], ld *F) {
 
     //1. Get primitive variables and compute intermediate speed
-    long double wL[8] = { 0 }; if(!toPrimitive(uL, wL)) return false; long double wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
+    ld wL[8] = { 0 }; if(!toPrimitive(uL, wL)) return false; ld wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
     
-    long double B2L = uL[5]*uL[5]+uL[6]*uL[6]+uL[7]*uL[7]; long double B2R = uR[5]*uR[5]+uR[6]*uR[6]+uR[7]*uR[7];
-    long double PTL = wL[4] + B2L/2.0; long double PTR = wR[4] + B2R/2.0;
+    ld B2L = uL[5]*uL[5]+uL[6]*uL[6]+uL[7]*uL[7]; ld B2R = uR[5]*uR[5]+uR[6]*uR[6]+uR[7]*uR[7];
+    ld PTL = wL[4] + B2L/2.0; ld PTR = wR[4] + B2R/2.0;
 
-    long double SM = ((SR-wR[1])*uR[1] - (SL-wL[1])*uL[1] - PTR + PTL) / ((SR-wR[1])*uR[0] - (SL-wL[1])*uL[0]);
-    long double PTsL = PTL + uL[0]*(SL-wL[1])*(SM-wL[1]); long double PTsR = PTR + uR[0]*(SR-wR[1])*(SM-wR[1]);
-    long double PTs = (PTsL+PTsR)/2.0;
+    ld SM = ((SR-wR[1])*uR[1] - (SL-wL[1])*uL[1] - PTR + PTL) / ((SR-wR[1])*uR[0] - (SL-wL[1])*uL[0]);
+    ld PTsL = PTL + uL[0]*(SL-wL[1])*(SM-wL[1]); ld PTsR = PTR + uR[0]*(SR-wR[1])*(SM-wR[1]);
+    ld PTs = (PTsL+PTsR)/2.0;
     //if (PTs != PTR + uR[0]*(SR-wR[1])*(SM-wR[1])) cout << "X_HLLCFlux:: PTs at left and right interfaces not constant." << endl;
 
     //2. Get intermediate variables
-    long double usL[8] = { 0 }; long double usR[8] = { 0 };
+    ld usL[8] = { 0 }; ld usR[8] = { 0 };
     usL[0] = uL[0]*(SL-wL[1])/(SL-SM);      usR[0] = uR[0]*(SR-wR[1])/(SR-SM);
     usL[5] = uL[5]; usR[5] = uR[5];
     usL[1] = SM; usR[1] = SM;
@@ -123,9 +123,9 @@ bool X_HLLCFlux(long double uL[8], long double uR[8], long double SL, long doubl
         usL[2] *= usL[0]; usR[2] *= usR[0];
         usL[3] *= usL[0]; usR[3] *= usR[0];
 
-        long double uL_dot_BL = wL[1]*wL[5]+wL[2]*wL[6]+wL[3]*wL[7]; long double uR_dot_BR = wR[1]*wR[5]+wR[2]*wR[6]+wR[3]*wR[7];
-        long double usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
-        long double usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
+        ld uL_dot_BL = wL[1]*wL[5]+wL[2]*wL[6]+wL[3]*wL[7]; ld uR_dot_BR = wR[1]*wR[5]+wR[2]*wR[6]+wR[3]*wR[7];
+        ld usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
+        ld usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
 
         usL[4] = ((SL-wL[1])*uL[4] - PTL*wL[1] + PTs*SM + usL[5]*(uL_dot_BL-usL_dot_BsL)) / (SL-SM);   usR[4] = ((SR-wR[1])*uR[4] - PTR*wR[1] + PTs*SM + usR[5]*(uR_dot_BR-usR_dot_BsR)) / (SR-SM);
 
@@ -150,9 +150,9 @@ bool X_HLLCFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
         /*usL[4] = ((SL-wL[1])*uL[4] - PTL*wL[1]) / (SL-SM);   usR[4] = ((SR-wR[1])*uR[4] - PTR*wR[1]) / (SR-SM);*/
 
-        long double uL_dot_BL = wL[1]*wL[5]+wL[2]*wL[6]+wL[3]*wL[7]; long double uR_dot_BR = wR[1]*wR[5]+wR[2]*wR[6]+wR[3]*wR[7];
-        long double usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
-        long double usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
+        ld uL_dot_BL = wL[1]*wL[5]+wL[2]*wL[6]+wL[3]*wL[7]; ld uR_dot_BR = wR[1]*wR[5]+wR[2]*wR[6]+wR[3]*wR[7];
+        ld usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
+        ld usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
 
         usL[4] = ((SL-wL[1])*uL[4] - PTL*wL[1] + PTs*SM + usL[5]*(uL_dot_BL-usL_dot_BsL)) / (SL-SM);   usR[4] = ((SR-wR[1])*uR[4] - PTR*wR[1] + PTs*SM + usR[5]*(uR_dot_BR-usR_dot_BsR)) / (SR-SM);
 
@@ -190,21 +190,21 @@ bool X_HLLCFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
 
 
-bool Y_HLLCFlux(long double uL[8], long double uR[8], long double SL, long double SR, long double GL[8], long double GR[8], long double *G) {
+bool Y_HLLCFlux(ld uL[8], ld uR[8], ld SL, ld SR, ld GL[8], ld GR[8], ld *G) {
 
     //1. Get primitive variables and compute intermediate speed
-    long double wL[8] = { 0 }; if(!toPrimitive(uL, wL)) return false; long double wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
+    ld wL[8] = { 0 }; if(!toPrimitive(uL, wL)) return false; ld wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
     
-    long double B2L = uL[5]*uL[5]+uL[6]*uL[6]+uL[7]*uL[7]; long double B2R = uR[5]*uR[5]+uR[6]*uR[6]+uR[7]*uR[7];
-    long double PTL = wL[4] + B2L/2.0; long double PTR = wR[4] + B2R/2.0;
+    ld B2L = uL[5]*uL[5]+uL[6]*uL[6]+uL[7]*uL[7]; ld B2R = uR[5]*uR[5]+uR[6]*uR[6]+uR[7]*uR[7];
+    ld PTL = wL[4] + B2L/2.0; ld PTR = wR[4] + B2R/2.0;
 
-    long double SM = ((SR-wR[2])*uR[2] - (SL-wL[2])*uL[2] - PTR + PTL) / ((SR-wR[2])*uR[0] - (SL-wL[2])*uL[0]);
-    long double PTsL = PTL + uL[0]*(SL-wL[2])*(SM-wL[2]); long double PTsR = PTR + uR[0]*(SR-wR[2])*(SM-wR[2]);
-    long double PTs = (PTsL+PTsR)/2.0;
+    ld SM = ((SR-wR[2])*uR[2] - (SL-wL[2])*uL[2] - PTR + PTL) / ((SR-wR[2])*uR[0] - (SL-wL[2])*uL[0]);
+    ld PTsL = PTL + uL[0]*(SL-wL[2])*(SM-wL[2]); ld PTsR = PTR + uR[0]*(SR-wR[2])*(SM-wR[2]);
+    ld PTs = (PTsL+PTsR)/2.0;
     //if (PTs != PTR + uR[0]*(SR-wR[1])*(SM-wR[1])) cout << "X_HLLCGlux:: PTs at left and right interfaces not constant." << endl;
 
     //2. Get intermediate variables
-    long double usL[8] = { 0 }; long double usR[8] = { 0 };
+    ld usL[8] = { 0 }; ld usR[8] = { 0 };
     usL[0] = uL[0]*(SL-wL[2])/(SL-SM);      usR[0] = uR[0]*(SR-wR[2])/(SR-SM);
     usL[6] = uL[6]; usR[6] = uR[6];
     usL[2] = SM; usR[2] = SM;
@@ -244,9 +244,9 @@ bool Y_HLLCFlux(long double uL[8], long double uR[8], long double SL, long doubl
         usL[2] *= usL[0]; usR[2] *= usR[0];
         usL[3] *= usL[0]; usR[3] *= usR[0];
 
-        long double uL_dot_BL = wL[1]*wL[5]+wL[2]*wL[6]+wL[3]*wL[7]; long double uR_dot_BR = wR[1]*wR[5]+wR[2]*wR[6]+wR[3]*wR[7];
-        long double usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
-        long double usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
+        ld uL_dot_BL = wL[1]*wL[5]+wL[2]*wL[6]+wL[3]*wL[7]; ld uR_dot_BR = wR[1]*wR[5]+wR[2]*wR[6]+wR[3]*wR[7];
+        ld usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
+        ld usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
 
         usL[4] = ((SL-wL[2])*uL[4] - PTL*wL[2] + PTs*SM + usL[6]*(uL_dot_BL-usL_dot_BsL)) / (SL-SM);   usR[4] = ((SR-wR[2])*uR[4] - PTR*wR[2] + PTs*SM + usR[6]*(uR_dot_BR-usR_dot_BsR)) / (SR-SM);
 
@@ -273,9 +273,9 @@ bool Y_HLLCFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
         /*usL[4] = ((SL-wL[1])*uL[4] - PTL*wL[1]) / (SL-SM);   usR[4] = ((SR-wR[1])*uR[4] - PTR*wR[1]) / (SR-SM);*/
 
-        long double uL_dot_BL = wL[1]*wL[5]+wL[2]*wL[6]+wL[3]*wL[7]; long double uR_dot_BR = wR[1]*wR[5]+wR[2]*wR[6]+wR[3]*wR[7];
-        long double usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
-        long double usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
+        ld uL_dot_BL = wL[1]*wL[5]+wL[2]*wL[6]+wL[3]*wL[7]; ld uR_dot_BR = wR[1]*wR[5]+wR[2]*wR[6]+wR[3]*wR[7];
+        ld usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
+        ld usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
 
         usL[4] = ((SL-wL[2])*uL[4] - PTL*wL[2] + PTs*SM + usL[6]*(uL_dot_BL-usL_dot_BsL)) / (SL-SM);   usR[4] = ((SR-wR[2])*uR[4] - PTR*wR[2] + PTs*SM + usR[6]*(uR_dot_BR-usR_dot_BsR)) / (SR-SM);
 
@@ -329,22 +329,22 @@ bool Y_HLLCFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
 
 
-bool X_HLLDFlux(long double uL[8], long double uR[8], long double SL, long double SR, long double FL[8], long double FR[8], long double *F) {
+bool X_HLLDFlux(ld uL[8], ld uR[8], ld SL, ld SR, ld FL[8], ld FR[8], ld *F) {
 
     if (uL[5] != uR[5]) {
         cout << "X_HLLDFlux:: Bx is different on the left and on the right !!!" << endl; return false;
     }
-    long double Bx = uL[5];
+    ld Bx = uL[5];
 
     //1. Get primitive variables and compute intermediate speed
-    long double wL[8] = { 0 }; if (!toPrimitive(uL, wL)) return false; long double wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
-    long double PTL = wL[4] + (uL[5]*uL[5]+uL[6]*uL[6]+uL[7]*uL[7])/2.0; long double PTR = wR[4] + (uR[5]*uR[5]+uR[6]*uR[6]+uR[7]*uR[7])/2.0;
+    ld wL[8] = { 0 }; if (!toPrimitive(uL, wL)) return false; ld wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
+    ld PTL = wL[4] + (uL[5]*uL[5]+uL[6]*uL[6]+uL[7]*uL[7])/2.0; ld PTR = wR[4] + (uR[5]*uR[5]+uR[6]*uR[6]+uR[7]*uR[7])/2.0;
 
-    long double SM = ((SR-wR[1])*uR[1] - (SL-wL[1])*uL[1] - PTR + PTL) / ((SR-wR[1])*uR[0] - (SL-wL[1])*uL[0]);
+    ld SM = ((SR-wR[1])*uR[1] - (SL-wL[1])*uL[1] - PTR + PTL) / ((SR-wR[1])*uR[0] - (SL-wL[1])*uL[0]);
 
     //2. Get the exterior intermediate flux (usL=u*L and usR=u*R)
-    long double usL[8] = { 0 }; long double usR[8] = { 0 };
-    long double PsT = (  (SR-wR[1])*uR[0]*PTL - (SL-wL[1])*uL[0]*PTR + uL[0]*uR[0]*(SR-wR[1])*(SL-wL[1])*(wR[1]-wL[1])  ) / (  (SR-wR[1])*uR[0] - (SL-wL[1])*uL[0]  );
+    ld usL[8] = { 0 }; ld usR[8] = { 0 };
+    ld PsT = (  (SR-wR[1])*uR[0]*PTL - (SL-wL[1])*uL[0]*PTR + uL[0]*uR[0]*(SR-wR[1])*(SL-wL[1])*(wR[1]-wL[1])  ) / (  (SR-wR[1])*uR[0] - (SL-wL[1])*uL[0]  );
 
 
     usL[0] = uL[0]*(SL-wL[1])/(SL-SM);   usR[0] = uR[0]*(SR-wR[1])/(SR-SM);
@@ -381,9 +381,9 @@ bool X_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
     }
 
-    long double uL_dot_BL = wL[1]*Bx+wL[2]*wL[6]+wL[3]*wL[7]; long double uR_dot_BR = wR[1]*Bx+wR[2]*wR[6]+wR[3]*wR[7];
-    long double usL_dot_BsL = usL[1]/usL[0]*Bx + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
-    long double usR_dot_BsR = usR[1]/usR[0]*Bx + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
+    ld uL_dot_BL = wL[1]*Bx+wL[2]*wL[6]+wL[3]*wL[7]; ld uR_dot_BR = wR[1]*Bx+wR[2]*wR[6]+wR[3]*wR[7];
+    ld usL_dot_BsL = usL[1]/usL[0]*Bx + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
+    ld usR_dot_BsR = usR[1]/usR[0]*Bx + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
 
     usL[4] = (  (SL-wL[1])*uL[4] - PTL*wL[1] + PsT*SM + Bx*(uL_dot_BL-usL_dot_BsL)  ) / (SL-SM);   usR[4] = (  (SR-wR[1])*uR[4] - PTR*wR[1] + PsT*SM + Bx*(uR_dot_BR-usR_dot_BsR)  ) / (SR-SM);
 
@@ -401,7 +401,7 @@ bool X_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
             return true;
         }
         if (SL <= 0 && SM >= 0) {
-            long double FsL[8] = { 0 };
+            ld FsL[8] = { 0 };
             for (int i = 0; i < 8; i++)
                 F[i] = FL[i] + SL*(usL[i]-uL[i]);
             for (int i = 0; i < 8; i++) {
@@ -437,12 +437,12 @@ bool X_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
 
     //2. Compute the intermediate wavespeeds SsL and SsR:
-    long double SsL = SM - fabsl(Bx)/sqrtl(usL[0]);   long double SsR = SM + fabsl(Bx)/sqrtl(usR[0]);
+    ld SsL = SM - fabsl(Bx)/sqrtl(usL[0]);   ld SsR = SM + fabsl(Bx)/sqrtl(usR[0]);
 
 
     //3. Compute the second intermediate fluxes (ussL=u**L and ussR=u**R)
-    long double ussL[8] = { 0 }; long double ussR[8] = { 0 };
-    long double rtrhoL = sqrtl(usL[0]); long double rtrhoR = sqrtl(usR[0]);
+    ld ussL[8] = { 0 }; ld ussR[8] = { 0 };
+    ld rtrhoL = sqrtl(usL[0]); ld rtrhoR = sqrtl(usR[0]);
 
     ussL[0] = usL[0]; ussR[0] = usR[0];
 
@@ -462,7 +462,7 @@ bool X_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
     usL_dot_BsL = usL[1]/usL[0]*Bx + usL[2]/usL[0]*usL[6] +usL[3]/usL[0]*usL[7];
     usR_dot_BsR = usR[1]/usR[0]*Bx + usR[2]/usR[0]*usR[6] +usR[3]/usR[0]*usR[7];
-    long double uss_dot_Bss = ussL[1]/ussL[0]*ussL[5] + ussL[2]/ussL[0]*ussL[6] + ussL[3]/ussL[0]*ussL[7];
+    ld uss_dot_Bss = ussL[1]/ussL[0]*ussL[5] + ussL[2]/ussL[0]*ussL[6] + ussL[3]/ussL[0]*ussL[7];
 
     ussL[4] = usL[4] - rtrhoL*(usL_dot_BsL-uss_dot_Bss)*sgn(Bx);   ussL[4] = usR[4] + rtrhoR*(usR_dot_BsR-uss_dot_Bss)*sgn(Bx);
 
@@ -476,7 +476,7 @@ bool X_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
         return true;
     }
     if (SL <= 0 && SsL >= 0) {
-        long double FsL[8] = { 0 };
+        ld FsL[8] = { 0 };
         for (int i = 0; i < 8; i++)
             F[i] = FL[i] + SL*(usL[i]-uL[i]);
         for (int i = 0; i < 8; i++) {
@@ -533,22 +533,22 @@ bool X_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
 }
 
 
-bool Y_HLLDFlux(long double uL[8], long double uR[8], long double SL, long double SR, long double GL[8], long double GR[8], long double *G) {
+bool Y_HLLDFlux(ld uL[8], ld uR[8], ld SL, ld SR, ld GL[8], ld GR[8], ld *G) {
 
     if (uL[6] != uR[6]) {
         cout << "Y_HLLDFlux:: By is different on the left and on the right !!!" << endl; return false;
     }
-    long double By = uL[6];
+    ld By = uL[6];
 
     //1. Get primitive variables and compute intermediate speed
-    long double wL[8] = { 0 }; if (!toPrimitive(uL, wL)) return false; long double wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
-    long double PTL = wL[4] + (uL[5]*uL[5]+uL[6]*uL[6]+uL[7]*uL[7])/2.0; long double PTR = wR[4] + (uR[5]*uR[5]+uR[6]*uR[6]+uR[7]*uR[7])/2.0;
+    ld wL[8] = { 0 }; if (!toPrimitive(uL, wL)) return false; ld wR[8] = { 0 }; if (!toPrimitive(uR, wR)) return false;
+    ld PTL = wL[4] + (uL[5]*uL[5]+uL[6]*uL[6]+uL[7]*uL[7])/2.0; ld PTR = wR[4] + (uR[5]*uR[5]+uR[6]*uR[6]+uR[7]*uR[7])/2.0;
 
-    long double SM = ((SR-wR[2])*uR[2] - (SL-wL[2])*uL[2] - PTR + PTL) / ((SR-wR[2])*uR[0] - (SL-wL[2])*uL[0]);
+    ld SM = ((SR-wR[2])*uR[2] - (SL-wL[2])*uL[2] - PTR + PTL) / ((SR-wR[2])*uR[0] - (SL-wL[2])*uL[0]);
 
     //2. Get the exterior intermediate flux (usL=u*L and usR=u*R)
-    long double usL[8] = { 0 }; long double usR[8] = { 0 };
-    long double PsT = ((SR-wR[2])*uR[0]*PTL - (SL-wL[2])*uL[0]*PTR + uL[0]*uR[0]*(SR-wR[2])*(SL-wL[2])*(wR[2]-wL[2])) / ((SR-wR[2])*uR[0] - (SL-wL[2])*uL[0]);
+    ld usL[8] = { 0 }; ld usR[8] = { 0 };
+    ld PsT = ((SR-wR[2])*uR[0]*PTL - (SL-wL[2])*uL[0]*PTR + uL[0]*uR[0]*(SR-wR[2])*(SL-wL[2])*(wR[2]-wL[2])) / ((SR-wR[2])*uR[0] - (SL-wL[2])*uL[0]);
 
 
     usL[0] = uL[0]*(SL-wL[2])/(SL-SM);   usR[0] = uR[0]*(SR-wR[2])/(SR-SM);
@@ -577,9 +577,9 @@ bool Y_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
         usL[7] = uL[7];   usR[7] = uR[7];
     }
 
-    long double uL_dot_BL = wL[1]*wL[5]+wL[2]*By+wL[3]*wL[7]; long double uR_dot_BR = wR[1]*wR[5]+wR[2]*By+wR[3]*wR[7];
-    long double usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*By +usL[3]/usL[0]*usL[7];
-    long double usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*By +usR[3]/usR[0]*usR[7];
+    ld uL_dot_BL = wL[1]*wL[5]+wL[2]*By+wL[3]*wL[7]; ld uR_dot_BR = wR[1]*wR[5]+wR[2]*By+wR[3]*wR[7];
+    ld usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*By +usL[3]/usL[0]*usL[7];
+    ld usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*By +usR[3]/usR[0]*usR[7];
 
     usL[4] = ((SL-wL[2])*uL[4] - PTL*wL[2] + PsT*SM + By*(uL_dot_BL-usL_dot_BsL)) / (SL-SM);   usR[4] = ((SR-wR[2])*uR[4] - PTR*wR[2] + PsT*SM + By*(uR_dot_BR-usR_dot_BsR)) / (SR-SM);
 
@@ -640,12 +640,12 @@ bool Y_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
 
     //2. Compute the intermediate wavespeeds SsL and SsR:
-    long double SsL = SM - fabsl(By)/sqrtl(usL[0]);   long double SsR = SM + fabsl(By)/sqrtl(usR[0]);
+    ld SsL = SM - fabsl(By)/sqrtl(usL[0]);   ld SsR = SM + fabsl(By)/sqrtl(usR[0]);
 
 
     //3. Compute the second intermediate fluxes (ussL=u**L and ussR=u**R)
-    long double ussL[8] = { 0 }; long double ussR[8] = { 0 };
-    long double rtrhoL = sqrtl(usL[0]); long double rtrhoR = sqrtl(usR[0]);
+    ld ussL[8] = { 0 }; ld ussR[8] = { 0 };
+    ld rtrhoL = sqrtl(usL[0]); ld rtrhoR = sqrtl(usR[0]);
 
     ussL[0] = usL[0]; ussR[0] = usR[0];
 
@@ -665,7 +665,7 @@ bool Y_HLLDFlux(long double uL[8], long double uR[8], long double SL, long doubl
 
     usL_dot_BsL = usL[1]/usL[0]*usL[5] + usL[2]/usL[0]*By +usL[3]/usL[0]*usL[7];
     usR_dot_BsR = usR[1]/usR[0]*usR[5] + usR[2]/usR[0]*By +usR[3]/usR[0]*usR[7];
-    long double uss_dot_Bss = ussL[1]/ussL[0]*ussL[5] + ussL[2]/ussL[0]*ussL[6] + ussL[3]/ussL[0]*ussL[7];
+    ld uss_dot_Bss = ussL[1]/ussL[0]*ussL[5] + ussL[2]/ussL[0]*ussL[6] + ussL[3]/ussL[0]*ussL[7];
 
     ussL[4] = usL[4] - rtrhoL*(usL_dot_BsL-uss_dot_Bss)*sgn(By);   ussL[4] = usR[4] + rtrhoR*(usR_dot_BsR-uss_dot_Bss)*sgn(By);
 

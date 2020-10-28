@@ -4,7 +4,7 @@ echo Deleting the previous problem file
 rm "prob.h"
 
 echo ""
-read -p 'Enter the problem file local directory (e.g. probs/otvortex.h): ' filename
+read -p 'Enter the problem file local directory (e.g. probs/shocktube.h): ' filename
 #filename=probs/otvortex.h
 
 if test -f "$filename"; then
@@ -14,8 +14,6 @@ else
     echo "The file $filename does not exist"
     exit 1
 fi
-
-
 
 
 echo ""

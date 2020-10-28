@@ -1,0 +1,63 @@
+_Comments_
+<description> = <These are the parameters for the Orszag-Tang problem, both available in HD and MHD.>
+<problem header> = <probs/otvortex.h>
+<recommended setup configuration> = <Adiabatic, no MHD or MHD, recontruction in characteristic variables, characteristic tracing>
+
+
+_domain_
+
+<Nx> = <192>
+<Ny> = <102>
+<Nz> = <1>
+<x0> = <0.0>
+<xn> = <2.0>
+<y0> = <0.0>
+<yn> = <2.0>
+<z0> = <0.0>
+<zn> = <1.0>
+<BCxin> = <periodic>
+<BCxout> = <periodic>
+<BCyin> = <periodic>
+<BCyout> = <periodic>
+<BCzin> = <periodic>
+<BCzout> = <periodic>
+
+
+_simulation_
+
+<t0> = <0.0>
+<tn> = <4.0>
+<CFL> = <0.3>
+
+
+_problem_
+
+<gamma> = <1.666666667>
+
+<B0> = <1.0>
+<v0> = <0.1>
+<rho0> = <1.0>
+<P0> = <0.1>
+
+
+
+_out:0_
+<name> = <dens>
+<format> = <csv>
+<dt> = <0.1>
+<ghosts> = <false>
+<var0> = <density>
+
+_out:1_
+<name> = <div>
+<format> = <csv>
+<dt> = <0.1>
+<ghosts> = <false>
+<var0> = <BDiv>
+
+_out:1_
+<name> = <Jz>
+<format> = <csv>
+<dt> = <0.1>
+<ghosts> = <false>
+<var0> = <Jz>

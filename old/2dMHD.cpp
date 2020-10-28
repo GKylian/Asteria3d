@@ -30,15 +30,15 @@ using namespace std::chrono;
 
 
 //Computes the fluxes at i-1/2 and j-1/2
-bool getFluxes(Arrays *u, Arrays *ix_u, Arrays *iy_u, int xi, int yi, long double *F_m, long double *G_m, int lvl) { // --OK-- (?!?!?!)
+bool getFluxes(Arrays *u, Arrays *ix_u, Arrays *iy_u, int xi, int yi, ld *F_m, ld *G_m, int lvl) { // --OK-- (?!?!?!)
 
 
     lvl = 2;
 
     /////0. A few things
-    long double ui[8] = { 0 };
-    long double u_xL[8] = { 0 }; long double u_xR[8] = { 0 };
-    long double u_yL[8] = { 0 }; long double u_yR[8] = { 0 };
+    ld ui[8] = { 0 };
+    ld u_xL[8] = { 0 }; ld u_xR[8] = { 0 };
+    ld u_yL[8] = { 0 }; ld u_yR[8] = { 0 };
     
 
     for (int i = 0; i < 8; i++)
@@ -57,15 +57,15 @@ bool getFluxes(Arrays *u, Arrays *ix_u, Arrays *iy_u, int xi, int yi, long doubl
     //!!! Bx and By are stored at (i-1/2, j) and (i, j-1/2) respectively
     
     //Bx and By at their next respective interface (Bx at i+1/2,j and By at i,j+1/2)
-    long double Bx_ix = u->at(5, xi+1, yi); long double By_iy = u->at(6, xi, yi+1); //!!! They are not cell-centered but face-centered 
+    ld Bx_ix = u->at(5, xi+1, yi); ld By_iy = u->at(6, xi, yi+1); //!!! They are not cell-centered but face-centered 
 
 
     //Make ui cell-centered Bx and By:
     ui[5] = (ui[5]+Bx_ix)/2; ui[6] = (ui[6]+By_iy)/2;
 
     //Bx and By at other interface (Bx at i,j-1/2 and By at i-1/2,j)
-    /*long double By_ix = ( ui[6] + (u->at(6, xi-1, yi+1)+u->at(6, xi-1, yi))/2 )/2;
-    long double Bx_iy = ( ui[5] + (u->at(5, xi+1, yi-1)+u->at(5, xi, yi-1))/2 )/2;*/
+    /*ld By_ix = ( ui[6] + (u->at(6, xi-1, yi+1)+u->at(6, xi-1, yi))/2 )/2;
+    ld Bx_iy = ( ui[5] + (u->at(5, xi+1, yi-1)+u->at(5, xi, yi-1))/2 )/2;*/
 
     //Values at interfaces L/R for Bx and By are the same (B_i-1/2 L/R = B_i-1/2):
     //u_xL[5] = ui[5]; u_xL[6] = By_ix; u_xR[5] = ui[5]; u_xR[6] = By_ix;
@@ -84,35 +84,35 @@ bool getFluxes(Arrays *u, Arrays *ix_u, Arrays *iy_u, int xi, int yi, long doubl
 
 
 
-    long double F_x[8] = { 0 }; long double G_y[8] = { 0 };
+    ld F_x[8] = { 0 }; ld G_y[8] = { 0 };
     //1. Compute F_x at i-1/2,j, so Bx=Bx_ix and By=By_ix
     if (true) {
 
         if (u_xL[5] != u_xR[5])
             cout << "ERROR::2DMHD.CPP::getFluxes:: Bx is different at left and right interfaces." << endl;
         //Find max wavespeeds:
-        long double waves_L[4] = { 0 }; if (!getXWaveSpeeds(u_xL, waves_L)) { cout << "X-getFluxes::XWaves left returned false" << endl; return false; }
-        long double waves_R[4] = { 0 }; if(!getXWaveSpeeds(u_xR, waves_R)) { cout << "X-getFluxes::XWaves right returned false" << endl; return false; }
-        long double c_L = *max_element(waves_L, waves_L+4); long double c_R = *max_element(waves_R, waves_R+4);
+        ld waves_L[4] = { 0 }; if (!getXWaveSpeeds(u_xL, waves_L)) { cout << "X-getFluxes::XWaves left returned false" << endl; return false; }
+        ld waves_R[4] = { 0 }; if(!getXWaveSpeeds(u_xR, waves_R)) { cout << "X-getFluxes::XWaves right returned false" << endl; return false; }
+        ld c_L = *max_element(waves_L, waves_L+4); ld c_R = *max_element(waves_R, waves_R+4);
 
 
         //Find eigenvalues (from smallest to largest):
-        long double eigen[7] = { 0 }; if(!getXEigenvalues(u_xL, u_xR, eigen)) return false;
-        long double lambda_m = *max_element(eigen, eigen+7); long double lambda_0 = *min_element(eigen, eigen+7);
+        ld eigen[7] = { 0 }; if(!getXEigenvalues(u_xL, u_xR, eigen)) return false;
+        ld lambda_m = *max_element(eigen, eigen+7); ld lambda_0 = *min_element(eigen, eigen+7);
         
 
 
-        //long double SR = fmaxl(lambda_m, u_xR[1]/u_xR[0] + c_R); //b_plus
-        //long double SL = fminl(lambda_0, u_xL[1]/u_xL[0] - c_L); //b_min
+        //ld SR = fmaxl(lambda_m, u_xR[1]/u_xR[0] + c_R); //b_plus
+        //ld SL = fminl(lambda_0, u_xL[1]/u_xL[0] - c_L); //b_min
 
 
-        long double SL = fminl(u_xL[1]/u_xL[0], u_xR[1]/u_xR[0]) - fmaxl(c_L, c_R);
-        long double SR = fmaxl(u_xL[1]/u_xL[0], u_xR[1]/u_xR[0]) + fmaxl(c_L, c_R);
+        ld SL = fminl(u_xL[1]/u_xL[0], u_xR[1]/u_xR[0]) - fmaxl(c_L, c_R);
+        ld SR = fmaxl(u_xL[1]/u_xL[0], u_xR[1]/u_xR[0]) + fmaxl(c_L, c_R);
 
 
 
-        long double F_L[8] = { 0 }; if(!F(u_xL, F_L)) return false;
-        long double F_R[8] = { 0 }; if(!F(u_xR, F_R)) return false;
+        ld F_L[8] = { 0 }; if(!F(u_xL, F_L)) return false;
+        ld F_R[8] = { 0 }; if(!F(u_xR, F_R)) return false;
 
 
         //We include Bx and By, but it's not important, we just won't use them
@@ -127,7 +127,7 @@ bool getFluxes(Arrays *u, Arrays *ix_u, Arrays *iy_u, int xi, int yi, long doubl
             if (!X_HLLFlux(u_xL, u_xR, SL, SR, F_L, F_R, F_m)) return false;
             //for (int i = 0; i < 8; i++)
             //{
-            //    long double Fi = (SR*F_L[i] - SL*F_R[i] + SR*SL*(u_xR[i]-u_xL[i])) / (SR-SL);
+            //    ld Fi = (SR*F_L[i] - SL*F_R[i] + SR*SL*(u_xR[i]-u_xL[i])) / (SR-SL);
             //    if (SL > 0)
             //        F_m[i] = F_L[i];//u_xL[i];//u->at(i, xi-1, yi);
             //    else if (SR < 0)
@@ -147,23 +147,23 @@ bool getFluxes(Arrays *u, Arrays *ix_u, Arrays *iy_u, int xi, int yi, long doubl
             cout << "ERROR::2DMHD.CPP::getFluxes:: By is different at left and right interfaces." << endl;
 
         //Find max wavespeeds:
-        long double waves_L[4] = { 0 }; if(!getYWaveSpeeds(u_yL, waves_L)) return false;
-        long double waves_R[4] = { 0 }; if(!getYWaveSpeeds(u_yR, waves_R)) return false;
-        long double c_L = *max_element(waves_L, waves_L+4); long double c_R = *max_element(waves_R, waves_R+4);
+        ld waves_L[4] = { 0 }; if(!getYWaveSpeeds(u_yL, waves_L)) return false;
+        ld waves_R[4] = { 0 }; if(!getYWaveSpeeds(u_yR, waves_R)) return false;
+        ld c_L = *max_element(waves_L, waves_L+4); ld c_R = *max_element(waves_R, waves_R+4);
 
         //Find eigenvalues (from smallest to largest):
-        long double eigen[7] = { 0 }; if(!getYEigenvalues(u_yL, u_yR, eigen)) return false;
-        long double lambda_m = *max_element(eigen, eigen+7); long double lambda_0 = *min_element(eigen, eigen+7);
+        ld eigen[7] = { 0 }; if(!getYEigenvalues(u_yL, u_yR, eigen)) return false;
+        ld lambda_m = *max_element(eigen, eigen+7); ld lambda_0 = *min_element(eigen, eigen+7);
 
-        //long double SR = fmaxl(lambda_m, u_yR[2]/u_yR[0] + c_R);
-        //long double SL = fminl(lambda_0, u_yL[2]/u_yL[0] - c_L);
+        //ld SR = fmaxl(lambda_m, u_yR[2]/u_yR[0] + c_R);
+        //ld SL = fminl(lambda_0, u_yL[2]/u_yL[0] - c_L);
 
-        long double SL = fminl(u_yL[2]/u_yL[0], u_yR[2]/u_yR[0]) - fmaxl(c_L, c_R);
-        long double SR = fmaxl(u_yL[2]/u_yL[0], u_yR[2]/u_yR[0]) + fmaxl(c_L, c_R);
+        ld SL = fminl(u_yL[2]/u_yL[0], u_yR[2]/u_yR[0]) - fmaxl(c_L, c_R);
+        ld SR = fmaxl(u_yL[2]/u_yL[0], u_yR[2]/u_yR[0]) + fmaxl(c_L, c_R);
 
 
-        long double G_L[8] = { 0 }; if(!G(u_yL, G_L)) return false;
-        long double G_R[8] = { 0 }; if(!G(u_yR, G_R)) return false;
+        ld G_L[8] = { 0 }; if(!G(u_yL, G_L)) return false;
+        ld G_R[8] = { 0 }; if(!G(u_yR, G_R)) return false;
 
 
 
@@ -180,7 +180,7 @@ bool getFluxes(Arrays *u, Arrays *ix_u, Arrays *iy_u, int xi, int yi, long doubl
             if (!Y_HLLFlux(u_yL, u_yR, SL, SR, G_L, G_R, G_m)) return false;
             /*for (int i = 0; i < 8; i++)
             {
-                long double Gi = (SR*G_L[i] - SL*G_R[i] + SR*SL*(u_yR[i]-u_yL[i])) / (SR-SL);
+                ld Gi = (SR*G_L[i] - SL*G_R[i] + SR*SL*(u_yR[i]-u_yL[i])) / (SR-SL);
                 if (SL > 0)
                     G_m[i] = G_L[i];
                 else if (SR < 0)
@@ -200,11 +200,11 @@ bool getFluxes(Arrays *u, Arrays *ix_u, Arrays *iy_u, int xi, int yi, long doubl
 }
 
 
-long double refEMF(Arrays *u, int xi, int yi) {
-    long double vx = u->at(1, xi, yi)/u->at(0, xi, yi); long double vy = u->at(2, xi, yi)/u->at(0, xi, yi);
-    long double Bx = (u->at(5, xi+1, yi)+u->at(5, xi, yi))/2; long double By = (u->at(6, xi, yi+1)+u->at(6, xi, yi))/2;
+ld refEMF(Arrays *u, int xi, int yi) {
+    ld vx = u->at(1, xi, yi)/u->at(0, xi, yi); ld vy = u->at(2, xi, yi)/u->at(0, xi, yi);
+    ld Bx = (u->at(5, xi+1, yi)+u->at(5, xi, yi))/2; ld By = (u->at(6, xi, yi+1)+u->at(6, xi, yi))/2;
     
-    long double val = -(vx*By - vy*Bx);
+    ld val = -(vx*By - vy*Bx);
     if (isnan(val))
         cout << "refEMF::Value is NaN" << endl;
     
@@ -213,18 +213,18 @@ long double refEMF(Arrays *u, int xi, int yi) {
 
 
 //Returns the bottom left corner EMF: Ez at (i-1/2, j-1/2)
-long double getEMFCorner(Arrays *u, Arrays *fs, Arrays *gs, int xi, int yi, long double dx, long double dy) {
+ld getEMFCorner(Arrays *u, Arrays *fs, Arrays *gs, int xi, int yi, ld dx, ld dy) {
 
     /////1. Get reference EMFs at cell centers i(-1), j(-1)
-    long double Er_i_j = refEMF(u, xi, yi);
-    long double Er_im_j = refEMF(u, xi-1, yi); long double Er_i_jm = refEMF(u, xi, yi-1);
-    long double Er_im_jm = refEMF(u, xi-1, yi-1);
+    ld Er_i_j = refEMF(u, xi, yi);
+    ld Er_im_j = refEMF(u, xi-1, yi); ld Er_i_jm = refEMF(u, xi, yi-1);
+    ld Er_im_jm = refEMF(u, xi-1, yi-1);
 
 
     
     /////2. Get face-centered EMF from fluxes at i-1/2, j(-1) from -F and at i(-1), j-1/2 from G
-    long double E_jp = -fs->at(6, xi, yi); long double E_jm = -fs->at(6, xi, yi-1); //On the y interface, above and under the corner
-    long double E_ip = gs->at(5, xi, yi); long double E_im = gs->at(5, xi-1, yi); //On the x interface, left and right to the corner
+    ld E_jp = -fs->at(6, xi, yi); ld E_jm = -fs->at(6, xi, yi-1); //On the y interface, above and under the corner
+    ld E_ip = gs->at(5, xi, yi); ld E_im = gs->at(5, xi-1, yi); //On the x interface, left and right to the corner
     if (null(E_jp)) E_jp = 0.0; if (null(E_jm)) E_jm = 0.0; if (null(E_ip)) E_ip = 0.0; if (null(E_im)) E_im = 0.0;
     /*if (E_jp != 0 || E_jm != 0 || E_ip != 0 || E_im != 0)
         cout << E_jp << ", " << E_jm << ", " << E_ip << ", " << E_im << endl;*/
@@ -244,14 +244,14 @@ long double getEMFCorner(Arrays *u, Arrays *fs, Arrays *gs, int xi, int yi, long
 
     /////3. Compute the four velocities: v_x(i-1/2, j(-1)) and v_y(i(-1), j-1/2)
     //TODO: Comment trouver les valeurs des vitesses aux interfaces ?
-    long double vx_jm = (u->at(1, xi, yi-1)/u->at(0, xi, yi-1) + u->at(1, xi-1, yi-1)/u->at(0, xi-1, yi-1))/2; long double vx_jp = (u->at(1, xi, yi)/u->at(0, xi, yi) + u->at(1, xi-1, yi)/u->at(0, xi-1, yi))/2;
-    long double vy_im = (u->at(2, xi-1, yi)/u->at(0, xi-1, yi) + u->at(2, xi-1, yi-1)/u->at(0, xi-1, yi-1))/2; long double vy_ip = (u->at(2, xi, yi)/u->at(0, xi, yi) + u->at(2, xi, yi-1)/u->at(0, xi, yi-1))/2;
-    long double rvx_jm = fs->at(0, xi, yi-1); long double rvx_jp = fs->at(0, xi, yi);
-    long double rvy_im = gs->at(0, xi-1, yi); long double rvy_ip = gs->at(0, xi, yi);
+    ld vx_jm = (u->at(1, xi, yi-1)/u->at(0, xi, yi-1) + u->at(1, xi-1, yi-1)/u->at(0, xi-1, yi-1))/2; ld vx_jp = (u->at(1, xi, yi)/u->at(0, xi, yi) + u->at(1, xi-1, yi)/u->at(0, xi-1, yi))/2;
+    ld vy_im = (u->at(2, xi-1, yi)/u->at(0, xi-1, yi) + u->at(2, xi-1, yi-1)/u->at(0, xi-1, yi-1))/2; ld vy_ip = (u->at(2, xi, yi)/u->at(0, xi, yi) + u->at(2, xi, yi-1)/u->at(0, xi, yi-1))/2;
+    ld rvx_jm = fs->at(0, xi, yi-1); ld rvx_jp = fs->at(0, xi, yi);
+    ld rvy_im = gs->at(0, xi-1, yi); ld rvy_ip = gs->at(0, xi, yi);
 
 
     //3.1) wrt to y at i-1/2, j-1/4 (so jp):
-    long double dEdy_jp = 0;
+    ld dEdy_jp = 0;
     if (rvx_jp > 0)
         dEdy_jp = (Er_im_j - E_im)*2/dy;
     else if (rvx_jp < 0)
@@ -261,7 +261,7 @@ long double getEMFCorner(Arrays *u, Arrays *fs, Arrays *gs, int xi, int yi, long
     if (null(dEdy_jp)) dEdy_jp = 0.0;
 
     //3.2) wrt to y at i-1/2,j-3/4 (so jm):
-    long double dEdy_jm = 0;
+    ld dEdy_jm = 0;
     if (rvx_jm > 0) // dE/dy at (i-1, j-3/4) --> 2/dy * ( E(i-1, j-1/2) - E(i-1, j-1) )
         dEdy_jm = (E_im - Er_im_jm)*2/dy;
     else if (rvx_jm < 0)
@@ -273,7 +273,7 @@ long double getEMFCorner(Arrays *u, Arrays *fs, Arrays *gs, int xi, int yi, long
 
 
     //3.3) wrt to x at i-1/4 (so ip)
-    long double dEdx_ip = 0;
+    ld dEdx_ip = 0;
     if (rvy_ip > 0)
         dEdx_ip = (Er_i_jm - E_jm)/(dx/2);
     else if (rvy_ip < 0)
@@ -283,7 +283,7 @@ long double getEMFCorner(Arrays *u, Arrays *fs, Arrays *gs, int xi, int yi, long
     if (null(dEdx_ip)) dEdx_ip = 0.0;
 
     //3.4) wrt to x at i-3/4 (so im)
-    long double dEdx_im = 0;
+    ld dEdx_im = 0;
     if (rvy_im > 0)
         dEdx_im = (E_jm - Er_im_jm)/(dx/2);
     else if (rvy_im < 0)
@@ -295,7 +295,7 @@ long double getEMFCorner(Arrays *u, Arrays *fs, Arrays *gs, int xi, int yi, long
 
 
     /////4. Compute the EMF at corner i-1/2, j-1/2
-    long double value = (long double) 0.25*(E_jp + E_jm + E_ip + E_im) + dy/8.0 * (dEdy_jm - dEdy_jp) + dx/8 * (dEdx_im - dEdx_ip);
+    ld value = (ld) 0.25*(E_jp + E_jm + E_ip + E_im) + dy/8.0 * (dEdy_jm - dEdy_jp) + dx/8 * (dEdx_im - dEdx_ip);
     /*if (value != 0)
         cout << "Only a sith deals in absolutes " << value << endl;*/
     if (fabsl(value) < 1e-12) value = 0;
@@ -304,15 +304,15 @@ long double getEMFCorner(Arrays *u, Arrays *fs, Arrays *gs, int xi, int yi, long
 
 }
 
-bool getSourceTerms(Arrays *u, int xi, int yi, long double *sx, long double *sy, long double dx, long double dy) {
-    long double dBx = (u->at(5, xi+1, yi) - u->at(5, xi, yi))/dx;
-    long double dBy = (u->at(6, xi, yi+1) - u->at(6, xi, yi))/dy;
+bool getSourceTerms(Arrays *u, int xi, int yi, ld *sx, ld *sy, ld dx, ld dy) {
+    ld dBx = (u->at(5, xi+1, yi) - u->at(5, xi, yi))/dx;
+    ld dBy = (u->at(6, xi, yi+1) - u->at(6, xi, yi))/dy;
 
-    long double Bxi = (u->at(5, xi+1, yi) + u->at(5, xi, yi))/2;
-    long double Byi = (u->at(6, xi, yi+1) + u->at(6, xi, yi))/2;
-    long double Bzi = u->at(7, xi, yi);
+    ld Bxi = (u->at(5, xi+1, yi) + u->at(5, xi, yi))/2;
+    ld Byi = (u->at(6, xi, yi+1) + u->at(6, xi, yi))/2;
+    ld Bzi = u->at(7, xi, yi);
 
-    long double vz = u->at(3, xi, yi)/u->at(0, xi, yi);
+    ld vz = u->at(3, xi, yi)/u->at(0, xi, yi);
 
     sx[0] = 0;
     sx[1] = Bxi*dBx; sx[2] = Byi*dBx; sx[3] = Bzi*dBx;
@@ -356,8 +356,8 @@ int main()
 {
     std::cout << "Hello World!\n";
 
-    long double gx = 0.0; long double gy = 0.0; long double gz = 0.0; long double rs = 2.0; //-1: constant g,  0: newtonian potential,  1+: pseudo-newtonian potential
-    int k = 100; long double CFL = 0.3; int smax = 50000;
+    ld gx = 0.0; ld gy = 0.0; ld gz = 0.0; ld rs = 2.0; //-1: constant g,  0: newtonian potential,  1+: pseudo-newtonian potential
+    int k = 100; ld CFL = 0.3; int smax = 50000;
 
     double x0 = 4.0; double xn = 44.0; int Nx = 128; double dx = (xn-x0)/(Nx-1.0);
     double y0 = -20.0; double yn = 20.0; int Ny = 128; double dy = (yn-y0)/(Ny-1.0);
@@ -400,7 +400,7 @@ int main()
     Arrays fs; fs.initAll(Nx+8, Ny+8); Arrays gs; gs.initAll(Nx+8, Ny+8);
 
     ofstream times("out/times.csv");// times << to_string(t0);
-    long double ts[6] = { 0 };
+    ld ts[6] = { 0 };
 
     int s = 0; int level = 0;
     for (double t = t0; t < tn; t+=dt)
@@ -422,9 +422,9 @@ int main()
         s++;
 
         double nextdt = 10.0;
-        long double maxDiv = 0;
-        long double maxu[8] = { 0 };
-        long double maxw[8] = { 0 };
+        ld maxDiv = 0;
+        ld maxu[8] = { 0 };
+        ld maxw[8] = { 0 };
         
         if (level > 0) {
             if (level > 2) {
@@ -491,7 +491,7 @@ int main()
         for (int xi = 2; xi < Nx+7; xi++)
         {
             
-            long double Fm[8] = { 0 }; long double Gm[8] = { 0 };
+            ld Fm[8] = { 0 }; ld Gm[8] = { 0 };
             if(!getFluxes(&us, &ix_us, &iy_us, xi, yi, Fm, Gm, 0))
                 if (!getFluxes(&us, &ix_us, &iy_us, xi, yi, Fm, Gm, 1))
                     if (!getFluxes(&us, &ix_us, &iy_us, xi, yi, Fm, Gm, 2)) {
@@ -530,9 +530,9 @@ int main()
         {
             
             //5.1) Compute EMFs at cell corners
-            long double E_im_jm = getEMFCorner(&us, &fs, &gs, xi, yi, dx, dy);
-            long double E_ip_jm = getEMFCorner(&us, &fs, &gs, xi+1, yi, dx, dy);
-            long double E_im_jp = getEMFCorner(&us, &fs, &gs, xi, yi+1, dx, dy);
+            ld E_im_jm = getEMFCorner(&us, &fs, &gs, xi, yi, dx, dy);
+            ld E_ip_jm = getEMFCorner(&us, &fs, &gs, xi+1, yi, dx, dy);
+            ld E_im_jp = getEMFCorner(&us, &fs, &gs, xi, yi+1, dx, dy);
             
             
             //5.3) Update Bx and By:
@@ -547,9 +547,9 @@ int main()
         {
             
             //5.2) Update the conserved variables from time n to time n+1
-            long double x = x0 + (xi-4.0)*dx; long double y = y0 + (yi-4.0)*dy;
+            ld x = x0 + (xi-4.0)*dx; ld y = y0 + (yi-4.0)*dy;
             
-            long double hrho = us.at(0, xi, yi)  -  dt/(2.0*dx) * (fs.at(0, xi+1, yi) - fs.at(0, xi, yi))  -dt/(2.0*dy) * (gs.at(0, xi, yi+1) - gs.at(0, xi, yi));
+            ld hrho = us.at(0, xi, yi)  -  dt/(2.0*dx) * (fs.at(0, xi+1, yi) - fs.at(0, xi, yi))  -dt/(2.0*dy) * (gs.at(0, xi, yi+1) - gs.at(0, xi, yi));
 
             //Gravitational source terms:
             if (rs < 0) {
@@ -560,11 +560,11 @@ int main()
             } else
             {
                 //TODO: Or (Phi(x+dx/2, y, rs)-Phi(x-dx/2, y, rs))/dx
-                long double phic = Phi_Rel(x, y, rs); long double phil_x = Phi_Rel(x-dx/2.0, y, rs); long double phir_x = Phi_Rel(x+dx/2.0, y, rs);
-                long double phil_y = Phi_Rel(x, y-dy/2.0, rs); long double phir_y = Phi_Rel(x, y+dy/2.0, rs);
-                //long double dpdx = (Phix(x+dx/2.0, y, rs)-Phix(x-dx/2.0, y, rs))/dx; long double dpdy = (Phiy(x, y+dy/2.0, rs)-Phiy(x, y-dy/2.0, rs))/dy;
-                long double Mx = (fs.at(0, xi+1, yi)+fs.at(0, xi, yi))/2.0;
-                long double My = (gs.at(0, xi, yi+1)+gs.at(0, xi, yi))/2.0;
+                ld phic = Phi_Rel(x, y, rs); ld phil_x = Phi_Rel(x-dx/2.0, y, rs); ld phir_x = Phi_Rel(x+dx/2.0, y, rs);
+                ld phil_y = Phi_Rel(x, y-dy/2.0, rs); ld phir_y = Phi_Rel(x, y+dy/2.0, rs);
+                //ld dpdx = (Phix(x+dx/2.0, y, rs)-Phix(x-dx/2.0, y, rs))/dx; ld dpdy = (Phiy(x, y+dy/2.0, rs)-Phiy(x, y-dy/2.0, rs))/dy;
+                ld Mx = (fs.at(0, xi+1, yi)+fs.at(0, xi, yi))/2.0;
+                ld My = (gs.at(0, xi, yi+1)+gs.at(0, xi, yi))/2.0;
 
                 _us.at(1, xi, yi) -= dt/dx*hrho*(phir_x-phil_x);
                 _us.at(2, xi, yi) -= dt/dy*hrho*(phir_y-phil_y);
@@ -584,7 +584,7 @@ int main()
                 cout << "Selected hydrodynamics, but B != 0" << endl; goto stop;
             }
             
-            long double u[8] = { 0 }; for (int i = 0; i < 8; i++) u[i] = _us.at(i, xi, yi);
+            ld u[8] = { 0 }; for (int i = 0; i < 8; i++) u[i] = _us.at(i, xi, yi);
             if (!toPrimitive(u, u)) {
                 cout << "Transformation to primitive after update at (" << xi << ", " << yi << ") failed !" << endl;
                 for (int i = 0; i < 8; i++) cout << u[i] << ", "; cout << "..." << endl;
@@ -632,7 +632,7 @@ int main()
         for (int xi = 4; xi < Nx+2; xi++)
         {
             
-            long double DivB = (us.at(5, xi+1, yi)-us.at(5, xi, yi))/dx + (us.at(6, xi, yi+1)-us.at(6, xi, yi))/dy;
+            ld DivB = (us.at(5, xi+1, yi)-us.at(5, xi, yi))/dx + (us.at(6, xi, yi+1)-us.at(6, xi, yi))/dy;
             if (fabsl(DivB) > fabsl(maxDiv)) maxDiv = DivB;
         }
         cout << "Maximum divergence: " << maxDiv << endl;
@@ -658,9 +658,9 @@ int main()
             
             
 
-            long double ui[8]; for (int i = 0; i < 8; i++) ui[i] = us.at(i, xi, yi);
+            ld ui[8]; for (int i = 0; i < 8; i++) ui[i] = us.at(i, xi, yi);
             ui[5] = (us.at(5, xi+1, yi)+us.at(5, xi, yi))/2.0; ui[6] = (us.at(6, xi, yi+1)+us.at(6, xi, yi))/2.0;
-            long double wi[8]; toPrimitive(ui, wi);
+            ld wi[8]; toPrimitive(ui, wi);
 
             for (int i = 0; i < 8; i++)
             {
@@ -669,11 +669,11 @@ int main()
             }
 
 
-            long double Cxs[4]; if (!getXWaveSpeeds(ui, Cxs)) cout << "dt xwaves" << endl; long double cx = *max_element(Cxs, Cxs+4);
-            long double Cys[4]; if (!getYWaveSpeeds(ui, Cys)) cout << "dt ywaves" << endl; long double cy = *max_element(Cys, Cys+4);
+            ld Cxs[4]; if (!getXWaveSpeeds(ui, Cxs)) cout << "dt xwaves" << endl; ld cx = *max_element(Cxs, Cxs+4);
+            ld Cys[4]; if (!getYWaveSpeeds(ui, Cys)) cout << "dt ywaves" << endl; ld cy = *max_element(Cys, Cys+4);
 
-            long double vx = fabsl(us.at(1, xi, yi)/us.at(0, xi, yi)); long double vy = fabsl(us.at(2, xi, yi)/us.at(0, xi, yi));
-            long double thdt = CFL * fminl(dx/(vx+cx), dy/(vy+cy));
+            ld vx = fabsl(us.at(1, xi, yi)/us.at(0, xi, yi)); ld vy = fabsl(us.at(2, xi, yi)/us.at(0, xi, yi));
+            ld thdt = CFL * fminl(dx/(vx+cx), dy/(vy+cy));
             if (thdt < nextdt)
                 nextdt = thdt;
         }
@@ -714,12 +714,12 @@ int main()
                     //out2 << us.at(0, 0, yi);
                     for (int xi = 0; xi <= Nx+7; xi++)
                     {
-                        long double Bx = (us.at(5, xi+1, yi)+us.at(5, xi, yi))/2.0; long double By = (us.at(6, xi, yi+1)+us.at(6, xi, yi))/2.0; long double Bz = us.at(7, xi, yi);
-                        long double B2 = Bx*Bx+By*By+Bz*Bz;
-                        long double v2 = powl(us.at(1, xi, yi)/us.at(0, xi, yi), 2)+powl(us.at(2, xi, yi)/us.at(0, xi, yi), 2)+powl(us.at(3, xi, yi)/us.at(0, xi, yi), 2);
-                        long double PB = B2/2.0;
-                        long double P = (us.at(4, xi, yi) - us.at(0, xi, yi)*v2/2 - B2/2) * (gamma-1);
-                        long double DivB = (us.at(5, xi+1, yi)-us.at(5, xi, yi))/dx + (us.at(6, xi, yi+1)-us.at(6, xi, yi))/dy;
+                        ld Bx = (us.at(5, xi+1, yi)+us.at(5, xi, yi))/2.0; ld By = (us.at(6, xi, yi+1)+us.at(6, xi, yi))/2.0; ld Bz = us.at(7, xi, yi);
+                        ld B2 = Bx*Bx+By*By+Bz*Bz;
+                        ld v2 = powl(us.at(1, xi, yi)/us.at(0, xi, yi), 2)+powl(us.at(2, xi, yi)/us.at(0, xi, yi), 2)+powl(us.at(3, xi, yi)/us.at(0, xi, yi), 2);
+                        ld PB = B2/2.0;
+                        ld P = (us.at(4, xi, yi) - us.at(0, xi, yi)*v2/2 - B2/2) * (gamma-1);
+                        ld DivB = (us.at(5, xi+1, yi)-us.at(5, xi, yi))/dx + (us.at(6, xi, yi+1)-us.at(6, xi, yi))/dy;
                         //out2 << sqrtl(powl(us.at(1, xi, yi)/us.at(0, xi, yi),2)+powl(us.at(2, xi, yi)/us.at(0, xi, yi), 2)) << ",";
                         //out2 << PB << ",";
                         out2 << us.at(0, xi, yi) << ","; //us.at(2, xi, yi)/us.at(0, xi, yi)
@@ -752,19 +752,19 @@ int main()
                 out << Ny << "," << y0 << "," << yn << endl;
                 int xii = (int)round(Nx/2.0+4.0);   //31(Vortex)
 
-                long double B2 = us.at(5, xii, 0)*us.at(5, xii, 0) + us.at(6, xii, 0)*us.at(6, xii, 0) + us.at(7, xii, 0)*us.at(7, xii, 0);
-                long double v2 = powl(us.at(1, xii, 0)/us.at(0, xii, 0), 2)+powl(us.at(2, xii, 0)/us.at(0, xii, 0), 2)+powl(us.at(3, xii, 0)/us.at(0, xii, 0), 2);
-                long double PB = B2/2.0;
-                long double P = (us.at(4, xii, 0) - us.at(0, xii, 0)*v2/2 - B2/2) * (gamma-1);
+                ld B2 = us.at(5, xii, 0)*us.at(5, xii, 0) + us.at(6, xii, 0)*us.at(6, xii, 0) + us.at(7, xii, 0)*us.at(7, xii, 0);
+                ld v2 = powl(us.at(1, xii, 0)/us.at(0, xii, 0), 2)+powl(us.at(2, xii, 0)/us.at(0, xii, 0), 2)+powl(us.at(3, xii, 0)/us.at(0, xii, 0), 2);
+                ld PB = B2/2.0;
+                ld P = (us.at(4, xii, 0) - us.at(0, xii, 0)*v2/2 - B2/2) * (gamma-1);
 
                 out << P;
                 //out << us.at(2, xii, 0)/us.at(0, xii, 0);// us.at(1, xii, 0)/us.at(0, xii, 0)
                 for (int yi = 1; yi < Ny+8; yi++)
                 {
-                    long double B2 = us.at(5, xii, yi)*us.at(5, xii, yi) + us.at(6, xii, yi)*us.at(6, xii, yi) + us.at(7, xii, yi)*us.at(7, xii, yi);
-                    long double v2 = powl(us.at(1, xii, yi)/us.at(0, xii, yi), 2)+powl(us.at(2, xii, yi)/us.at(0, xii, yi), 2)+powl(us.at(3, xii, yi)/us.at(0, xii, yi), 2);
-                    long double PB = B2/2.0;
-                    long double P = (us.at(4, xii, yi) - us.at(0, xii, yi)*v2/2 - B2/2) * (gamma-1);
+                    ld B2 = us.at(5, xii, yi)*us.at(5, xii, yi) + us.at(6, xii, yi)*us.at(6, xii, yi) + us.at(7, xii, yi)*us.at(7, xii, yi);
+                    ld v2 = powl(us.at(1, xii, yi)/us.at(0, xii, yi), 2)+powl(us.at(2, xii, yi)/us.at(0, xii, yi), 2)+powl(us.at(3, xii, yi)/us.at(0, xii, yi), 2);
+                    ld PB = B2/2.0;
+                    ld P = (us.at(4, xii, yi) - us.at(0, xii, yi)*v2/2 - B2/2) * (gamma-1);
                     out << "," << us.at(0, xii, yi);
 
                     //out << "," << us.at(2, xii, yi)/us.at(0, xii, yi);// us.at(1, xii, yi)/us.at(0, xii, yi)

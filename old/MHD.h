@@ -9,40 +9,40 @@
 
 
 //Returns dPhi/dx
-double Phix(long double x, long double y, long double rs) {
+double Phix(ld x, ld y, ld rs) {
     return 0;
-    long double r = sqrtl(x*x+y*y);
+    ld r = sqrtl(x*x+y*y);
     if (r <= rs) return 0;
     return x/(r*(r-rs)*(r-rs));
 }
 
 //Returns dPhi/dy
-double Phiy(long double x, long double y, long double rs) {
+double Phiy(ld x, ld y, ld rs) {
     //return 0.0;
-    long double r = sqrtl(x*x+y*y);
+    ld r = sqrtl(x*x+y*y);
     if (r == rs) return 0;
     return y/(r*(r-rs)*(r-rs));
 }
 
-double Phi_Newt(long double x, long double y) {
-    long double r = sqrtl(x*x+y*y);
+double Phi_Newt(ld x, ld y) {
+    ld r = sqrtl(x*x+y*y);
     if (r == 0) return 0;
     return -1.0/r;
 }
 
-double Phi_Rel(long double x, long double y, long double rs) {
-    long double r = sqrtl(x*x+y*y);
+double Phi_Rel(ld x, ld y, ld rs) {
+    ld r = sqrtl(x*x+y*y);
     if (r <= rs) return 0;
     return -1.0/(r-rs);
 }
 
 
-bool toPrimitive(long double *u, long double *w) {
+bool toPrimitive(ld *u, ld *w) {
     w[0] = u[0]; w[1] = u[1]/u[0]; w[2] = u[2]/u[0]; w[3] = u[3]/u[0];
     w[5] = u[5]; w[6] = u[6]; w[7] = u[7];
 
-    long double v2 = w[1]*w[1]+w[2]*w[2]+w[3]*w[3];
-    long double B2 = w[5]*w[5]+w[6]*w[6]+w[7]*w[7];
+    ld v2 = w[1]*w[1]+w[2]*w[2]+w[3]*w[3];
+    ld B2 = w[5]*w[5]+w[6]*w[6]+w[7]*w[7];
     w[4] = (u[4] - w[0]*v2/2 - B2/2) * (gamma-1);
     if (w[4] <= 0) {
         std::cout << "toPrimitive::The pressure is negative or null !!!" << std::endl; return false;
@@ -55,13 +55,13 @@ bool toPrimitive(long double *u, long double *w) {
     return true;
 }
 
-bool toConserved(long double *w, long double *u) {
-    long double vx = w[1]; long double vy = w[2]; long double vz = w[3];
+bool toConserved(ld *w, ld *u) {
+    ld vx = w[1]; ld vy = w[2]; ld vz = w[3];
     u[0] = w[0]; u[1] = w[0]*vx; u[2] = w[0]*vy; u[3] = w[0]*vz;
     u[5] = w[5]; u[6] = w[6]; u[7] = w[7];
 
-    long double v2 = vx*vx+vy*vy+vz*vz;
-    long double B2 = w[5]*w[5]+w[6]*w[6]+w[7]*w[7];
+    ld v2 = vx*vx+vy*vy+vz*vz;
+    ld B2 = w[5]*w[5]+w[6]*w[6]+w[7]*w[7];
 
     u[4] = w[4]/(gamma-1) + w[0]*v2/2 + B2/2;
 
@@ -73,20 +73,20 @@ bool toConserved(long double *w, long double *u) {
     return true;
 }
 
-bool F(long double u[8], long double *flux) {
+bool F(ld u[8], ld *flux) {
     //rho, Mx, My, Mz, E, Bx, By, Bz
     if (u[0] <= 0)
         return false;
-    long double vx = u[1]/u[0]; long double vy = u[2]/u[0]; long double vz = u[3]/u[0];
-    long double v = sqrtl(vx*vx + vy*vy + vz*vz);
-    long double B = sqrtl(u[5]*u[5] + u[6]*u[6] + u[7]*u[7]);
-    long double P = (u[4] - u[0]*v*v/2 - B*B/2) * (gamma - 1);
+    ld vx = u[1]/u[0]; ld vy = u[2]/u[0]; ld vz = u[3]/u[0];
+    ld v = sqrtl(vx*vx + vy*vy + vz*vz);
+    ld B = sqrtl(u[5]*u[5] + u[6]*u[6] + u[7]*u[7]);
+    ld P = (u[4] - u[0]*v*v/2 - B*B/2) * (gamma - 1);
     if (P <= 0) {
         std::cout << "FUNCTION::ERROR::The pressure is negative or null: " << P << std::endl;
         return false;
     }
 
-    long double Pstar = P + B*B/2;
+    ld Pstar = P + B*B/2;
 
     flux[0] = u[1];
     flux[1] = u[1]*vx + Pstar - u[5]*u[5];
@@ -100,20 +100,20 @@ bool F(long double u[8], long double *flux) {
     return true;
 }
 
-bool G(long double u[8], long double *flux) {
+bool G(ld u[8], ld *flux) {
     //0=rho, 1=Mx, 2=My, 3=Mz, 4=E, 5=Bx, 6=By, 7=Bz
     if (u[0] <= 0)
         return false;
-    long double vx = u[1]/u[0]; long double vy = u[2]/u[0]; long double vz = u[3]/u[0];
-    long double v = sqrtl(vx*vx + vy*vy + vz*vz);
-    long double B = sqrtl(u[5]*u[5] + u[6]*u[6] + u[7]*u[7]);
-    long double P = (u[4] - u[0]*v*v/2 - B*B/2) * (gamma - 1);
+    ld vx = u[1]/u[0]; ld vy = u[2]/u[0]; ld vz = u[3]/u[0];
+    ld v = sqrtl(vx*vx + vy*vy + vz*vz);
+    ld B = sqrtl(u[5]*u[5] + u[6]*u[6] + u[7]*u[7]);
+    ld P = (u[4] - u[0]*v*v/2 - B*B/2) * (gamma - 1);
     if (P <= 0) {
         std::cout << "FUNCTION::ERROR::The pressure is negative or null: " << P << std::endl;
         return false;
     }
 
-    long double Pstar = P + B*B/2;
+    ld Pstar = P + B*B/2;
 
     flux[0] = u[2];
     flux[1] = u[2]*vx - u[6]*u[5];
@@ -137,8 +137,8 @@ enum bound
 };
 
 
-void setBoundaries(bound xbounds, bound ybounds, Arrays *us, int Nx, int Ny, long double gy) {
-    long double y0 = us->y0; long double yn = us->yn; long double dy = us->dy;
+void setBoundaries(bound xbounds, bound ybounds, Arrays *us, int Nx, int Ny, ld gy) {
+    ld y0 = us->y0; ld yn = us->yn; ld dy = us->dy;
 
     if (xbounds == bound::OUTFLOW) {
         for (int yi = 0; yi < Ny+8; yi++) {
@@ -230,8 +230,8 @@ void setBoundaries(bound xbounds, bound ybounds, Arrays *us, int Nx, int Ny, lon
             for (int gh = 1; gh <= 4; gh++)
             {
                 /*  At the y0 boundary  */
-                long double wout[8] = { 0 }; /*  Ghost cell  */ 
-                long double win[8]  = { 0 }; for (int i = 0; i < 8; i++) win[i]  = us->at(i, xi, 4+gh-1); /*  Corresponding cell*/
+                ld wout[8] = { 0 }; /*  Ghost cell  */ 
+                ld win[8]  = { 0 }; for (int i = 0; i < 8; i++) win[i]  = us->at(i, xi, 4+gh-1); /*  Corresponding cell*/
                 win[5] = (us->at(5, xi, 4+gh-1)+us->at(5, xi+1, 4+gh-1))/2.0;   win[6] = (us->at(6, xi, 4+gh-1)+us->at(6, xi, 4+gh))/2.0; /*  Compute the cell-centered magnetic fields  */
 
                 toPrimitive(win, win); 

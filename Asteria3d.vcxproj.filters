@@ -122,9 +122,6 @@
     <ClInclude Include="Riemann\hlle.h">
       <Filter>Riemann</Filter>
     </ClInclude>
-    <ClInclude Include="probs\sod.h">
-      <Filter>Probs</Filter>
-    </ClInclude>
     <ClInclude Include="Export\csv.h">
       <Filter>Export</Filter>
     </ClInclude>
@@ -133,6 +130,24 @@
     </ClInclude>
     <ClInclude Include="Eq\CT.h">
       <Filter>Eq</Filter>
+    </ClInclude>
+    <ClInclude Include="readParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="probs\shocktube.h">
+      <Filter>Probs</Filter>
+    </ClInclude>
+    <ClInclude Include="probs\loops.h">
+      <Filter>Probs</Filter>
+    </ClInclude>
+    <ClInclude Include="probs\currentsheet.h">
+      <Filter>Probs</Filter>
+    </ClInclude>
+    <ClInclude Include="probs\rtinstability.h">
+      <Filter>Probs</Filter>
+    </ClInclude>
+    <ClInclude Include="probs\blast.h">
+      <Filter>Probs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

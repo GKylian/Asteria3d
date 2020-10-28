@@ -3,7 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-N = pandas.read_csv("exports/density_0.csv", header=None, skiprows=None, nrows=1).to_numpy()
+
+
+name = 'dens'
+nid = 11
+
+
+
+N = pandas.read_csv("exports/"+name+"_0.csv", header=None, skiprows=None, nrows=1).to_numpy()
 N = N[0]
 Nx = N[0]
 Ny = N[1]
@@ -15,7 +22,7 @@ print("Dimensions:",dim)
 if dim > 1:
     sys.exit("There is more than one dimension")
 
-d = pandas.read_csv("exports/density_0.csv", header=None, skiprows=1, nrows=1).to_numpy()
+d = pandas.read_csv("exports/"+name+"_0.csv", header=None, skiprows=1, nrows=1).to_numpy()
 d = d[0]
 dx = d[0]
 dy = d[1]
@@ -24,7 +31,7 @@ dz = d[2]
 print(f"Resolution: {Nx} x {Ny} x {Nz}")
 print(f"Step sizes: {dx} & {dy} & {dz}")
 
-p0 = pandas.read_csv("exports/density_0.csv", header=None, skiprows=2, nrows=1).to_numpy()
+p0 = pandas.read_csv("exports/"+name+"_0.csv", header=None, skiprows=2, nrows=1).to_numpy()
 p0 = p0[0]
 x0 = p0[0]
 y0 = p0[1]
@@ -37,9 +44,14 @@ zn = z0+(Nz-1)*dz
 print(f"Domain range:[{x0}; {xn}] x [{y0}; {yn}] x [{z0}; {zn}]")
 
 
-def plot(i):
-    data = pandas.read_csv("exports/density_"+str(i)+".csv", header=None, skiprows=3, nrows=1).to_numpy()
+def plot(i, var):
+    path = "exports/"+var+"_"+str(i)+".csv"
+    data = pandas.read_csv(path, header=None, skiprows=3, nrows=1).to_numpy()
     data = data[0]
+    print("Rendering data at ",path)
+
+    print("Minimum:",np.min(data))
+    print("Maximum:",np.max(data))
     
     x = 0
     if Nx > 1:
@@ -53,6 +65,4 @@ def plot(i):
     plt.show()
     #plt.savefig("graphs/density_"+str(i)+".png", dpi=300)
 
-for i in range(0, 186, 25):
-    plot(i)
-#plot(184)
+plot(nid, name)

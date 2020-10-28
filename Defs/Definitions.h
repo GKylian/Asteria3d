@@ -4,6 +4,11 @@
 #include <iostream>
 #include "../Config.h"
 #include <vector>
+#include <map>
+#include <string>
+
+typedef std::map<std::string, std::map<std::string, std::string>> map2d;
+typedef long double ld;
 
 /* Defines all the parameters set pre-compiling
 <->
@@ -31,12 +36,11 @@
 #define PRIMBOUNDS
 
 #ifdef MHD
-  #define NGHOST 3
+  #define NGHOST 4
 #else
-  #define NGHOST 2
+  #define NGHOST 3
 #endif // MHD
 
-#define NGHOST 3
 
 #ifdef MHD
   #define NVAL 8
@@ -56,14 +60,25 @@
 
 #define WV (NWAVE-1)/2
 
-//#define CT
+#ifdef MHD
+  #define CT
+#endif // MHD
+
 
 enum class bounds
 {
     PERIODIC,
     OUTFLOW,
     REFLECTING,
-    PRESSURE    /* For RT instability, extrapolate pressure with grav. potential to ghost cells to improve conservation of energy */
+    //PRESSURE,    /* For RT instability, extrapolate pressure with grav. potential to ghost cells to improve conservation of energy */
+    USER
+};
+
+std::map<std::string, bounds> strBC = {
+    {"outflow", bounds::OUTFLOW},
+    {"periodic", bounds::PERIODIC},
+    {"reflecting", bounds::REFLECTING},
+    {"user", bounds::USER}
 };
 
 enum class exports
@@ -82,13 +97,20 @@ enum class exports
     E,
     P,
     Bvec,
-    Bx,
-    By,
-    Bz,
-    DIVB
+    BX,
+    BY,
+    BZ,
+    DIVB,
+    B,
+    M,
+    V,
+    J,
+    Jx,
+    Jy,
+    Jz
 };
 
-std::string exp_names[18] = {
+std::string exp_names[25] = {
     "Primitive_variables",
     "Conserved_variable",
     "Density",
@@ -106,7 +128,43 @@ std::string exp_names[18] = {
     "Bx",
     "By",
     "Bz",
-    "B_Divergence"
+    "B_Divergence",
+    "B",
+    "M",
+    "V",
+    "J",
+    "Jx",
+    "Jy",
+    "Jz"
+};
+
+std::map<std::string, exports> strToExp = {
+    {"primitive",exports::PRIM},
+    {"conserved",exports::CONS},
+    {"density",exports::Rho},
+    {"v",exports::Vvec},
+    {"vx",exports::VX},
+    {"vy",exports::VY},
+    {"vz",exports::VZ},
+    {"Mvec",exports::Mvec},
+    {"Mx",exports::MX},
+    {"My",exports::MY},
+    {"Mz",exports::MZ},
+    {"energy",exports::E},
+    {"pressure",exports::P},
+    {"Bvec",exports::Bvec},
+    {"Bx",exports::BX},
+    {"By",exports::BY},
+    {"Bz",exports::BZ},
+    {"BDiv",exports::DIVB},
+    {"Vvec",exports::V},
+    {"B",exports::B},
+    {"M",exports::M},
+    {"J",exports::J},
+    {"Jx",exports::Jx},
+    {"Jy",exports::Jy},
+    {"Jz",exports::Jz}
+
 };
 
 struct Export
@@ -114,7 +172,7 @@ struct Export
     int type = 0; /*0: vtk    1: csv */
     std::vector<exports> exp;   /* What variables to export ?*/
 
-    int xType;  /* 0: export the whole dimension    1: average across the whole dimension    2: take slice at n-th cell*/
+    int xType = 0;  /* 0: export the whole dimension    1: average across the whole dimension    2: take slice at n-th cell*/
     int xSlice = 0; /* Slice at xSlice-th cell */
     int yType;
     int ySlice = 0;
@@ -124,5 +182,9 @@ struct Export
     bool ghosts = false;
 
     std::string name = "output";
+
+    double dt = 0.1;
+
+    int id = 0; // Keeps count of how many times we exported it.
     
 };

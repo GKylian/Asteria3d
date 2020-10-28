@@ -101,20 +101,233 @@ bool csv_add(Arrays *u, bool ghosts, exports out, string fname)
 	/* -------------------- SCALAR EXPORT -------------------- */
 
 	if (out == exports::Rho) {
-		cout << "EXPORT::csv.h:: Exporting the density" << endl;
-		
 		/* Write the scalar each line */
 		for(int k = kmin; k <= kmax; k++)
 		for(int j = jmin; j <= jmax; j++)
 		for(int i = imin; i <= imax; i++)
 		{
-			//cout << i << ", " << j << endl;
-			//cout << u->uC(0, i, j, k) << endl;
 			csv << u->uC(0, i, j, k);
 			if (k != kmax || j != jmax || i != imax) csv << ",";
 		}
 		csv << endl;
 	}
+
+
+	if (out == exports::V) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << sqrtl( SQ(u->uP(1, i, j, k)) + SQ(u->uP(2, i, j, k)) + SQ(u->uP(3, i, j, k)) );
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::VX) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uP(1, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::VY) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uP(2, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::VZ) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uP(3, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+
+
+	if (out == exports::M) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << sqrtl( SQ(u->uC(1, i, j, k)) + SQ(u->uC(2, i, j, k)) + SQ(u->uC(3, i, j, k)) );
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::MX) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uC(1, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::MY) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uC(2, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::MZ) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uC(3, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+
+
+	if (out == exports::B) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << sqrtl( SQ(u->uP(5, i, j, k)) + SQ(u->uP(6, i, j, k)) + SQ(u->uP(7, i, j, k)) );
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::BX) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uP(5, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::BY) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uP(6, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::BZ) {
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			csv << u->uP(7, i, j, k);
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	
+
+	if (out == exports::J) { // Magnitude of the Current density
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			ld dBxdy = 0.0; ld dBxdz = 0.0;   ld dBydx = 0.0; ld dBydz = 0.0;   ld dBzdx = 0.0; ld dBzdy = 0.0;
+			if (u->Nx > 1) {
+				dBydx = (u->uC(6, i+1, j, k)-u->uC(6, i, j, k))/u->dx;   dBzdx = (u->uC(7, i+1, j, k)-u->uC(7, i, j, k))/u->dx;
+			}
+			if (u->Ny > 1) {
+				dBxdy = (u->uC(5, i, j+1, k)-u->uC(5, i, j, k))/u->dy;   dBzdy = (u->uC(7, i, j+1, k)-u->uC(7, i, j, k))/u->dy;
+			}
+			if (u->Nz > 1) {
+				dBxdz = (u->uC(5, i, j, k+1)-u->uC(5, i, j, k))/u->dz;   dBydz = (u->uC(6, i, j, k)-u->uC(6, i, j, k+1))/u->dz;
+			}
+			csv << sqrtl( SQ(dBzdy - dBydz) + SQ(dBxdz - dBzdx) + SQ(dBydx - dBxdy) );
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::Jx) { // Magnitude of the Current density
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			ld dBydz = 0.0; ld dBzdy = 0.0;
+
+			if (u->Ny > 1)
+				dBzdy = (u->uC(7, i, j+1, k)-u->uC(7, i, j, k))/u->dy;
+			if (u->Nz > 1)
+				dBydz = (u->uC(6, i, j, k)-u->uC(6, i, j, k+1))/u->dz;
+			
+			csv << dBzdy - dBydz;
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::Jy) { // Magnitude of the Current density
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			ld dBxdz = 0.0; ld dBzdx = 0.0;
+			if (u->Nx > 1)
+				dBzdx = (u->uC(7, i+1, j, k)-u->uC(7, i, j, k))/u->dx;
+			if (u->Nz > 1)
+				dBxdz = (u->uC(5, i, j, k+1)-u->uC(5, i, j, k))/u->dz;
+			
+			csv << dBxdz - dBzdx;
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+	if (out == exports::Jz) { // Magnitude of the Current density
+		/* Write the scalar each line */
+		for(int k = kmin; k <= kmax; k++)
+		for(int j = jmin; j <= jmax; j++)
+		for(int i = imin; i <= imax; i++)
+		{
+			ld dBxdy = 0.0; ld dBydx = 0.0;
+			if (u->Nx > 1)
+				dBydx = (u->uC(6, i+1, j, k)-u->uC(6, i, j, k))/u->dx;
+			if (u->Ny > 1)
+				dBxdy = (u->uC(5, i, j+1, k)-u->uC(5, i, j, k))/u->dy;
+			csv << dBydx - dBxdy;
+			if (k != kmax || j != jmax || i != imax) csv << ",";
+		}
+		csv << endl;
+	}
+
+
+
+
+
 	if (out == exports::P) {
 		/* Write the scalar each line */
 		for(int k = kmin; k <= kmax; k++)
@@ -139,14 +352,14 @@ bool csv_add(Arrays *u, bool ghosts, exports out, string fname)
 	}
 
 #ifdef MHD
-	long double maxDiv = 0.0;
+	ld maxDiv = 0.0;
 	if (out == exports::DIVB) {
 		/* Write the scalar each line */
 		for(int k = kmin; k <= kmax; k++)
 		for(int j = jmin; j <= jmax; j++)
 		for(int i = imin; i <= imax; i++)
 		{
-			long double DivB = getDiv(u, i, j, k);
+			ld DivB = getDiv(u, i, j, k);
 			csv << DivB;
 			if (k != kmax || j != jmax || i != imax) csv << ",";
 			if (fabsl(DivB)>fabsl(maxDiv))
@@ -162,13 +375,28 @@ bool csv_add(Arrays *u, bool ghosts, exports out, string fname)
 	return true;
 }
 
-bool csv(Arrays *u, vector<Export> out)
+bool csv(Arrays *u, vector<Export> *out)
 {
 
-	
-	for (Export E : out) {
+	for (int i = 0; i < out->size(); i++) {
+		Export E = out->at(i);
+	//for (Export E : out) {
 		if (E.type != 1) continue; /* if not csv */
-		string fname = "exports/"+E.name+"_"+to_string(u->s)+".csv";
+
+		/* Check if we need to export based on dt */
+		bool toexp = false;
+		for (double t = 0; t <= u->t+2*u->dt; t+=E.dt)
+		{
+			/* I'm going to have to find a new way of doing this. */
+			if ((u->t < t && u->t+u->dt >= t) || u->t == 0.0) {
+				/* If the multiple of the export Dt is between t and t+dt, then export now. Else continue to next variable. */
+				toexp = true; break;
+			}
+		}
+		if (toexp == false) continue;
+		
+
+		string fname = "exports/"+E.name+"_"+to_string(E.id)+".csv";
 		cout << "EXPORT:: Exporting to csv file " << fname << endl;
 		ofstream csv(fname, ios::out | ios::trunc);
 
@@ -206,6 +434,9 @@ bool csv(Arrays *u, vector<Export> out)
 				csv_add(u, E.ghosts, e, fname);
 			}
 		}
+
+
+		out->at(i).id += 1;
 	}
 
 	

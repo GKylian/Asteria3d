@@ -63,10 +63,10 @@ private:
 struct Arrays
 {
 	//rho, Mx, My, Mz, E, Bx, By, Bz
-	Array<long double> arr[8];
+	Array<ld> arr[8];
 	int Nx, Ny = 0;
-	long double dx, dy = 0;
-	long double x0, xn, y0, yn = 0.0;
+	ld dx, dy = 0;
+	ld x0, xn, y0, yn = 0.0;
 
 	void initAll(int nx, int ny) {
 		Nx = nx; Ny = ny;
@@ -78,21 +78,21 @@ struct Arrays
 		
 	}
 
-	void seth(long double _dx, long double _dy) {
+	void seth(ld _dx, ld _dy) {
 		dx = _dx; dy = _dy;
 	}
 
-	void setRange(long double _x0, long double _xn, long double _y0, long double _yn) {
+	void setRange(ld _x0, ld _xn, ld _y0, ld _yn) {
 		x0 = _x0; xn = _xn; y0 = _y0; yn = _yn;
 	}
 
-	long double &at(int i, int xi, int yi) {
+	ld &at(int i, int xi, int yi) {
 		return arr[i].get(xi, yi);
 	}
 	
 	
 
-	Array<long double> &get(int i) {
+	Array<ld> &get(int i) {
 		return arr[i];
 	}
 };

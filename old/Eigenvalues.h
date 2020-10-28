@@ -15,15 +15,15 @@ const double gamma = 5.0/3.0;
 
 
 
-bool getEigenHD(long double *w, long double *eigen, long double L[][5], long double R[][5]) {
-    long double rh = w[0];  long double vn = w[1];  long double P = w[4];
+bool getEigenHD(ld *w, ld *eigen, ld L[][5], ld R[][5]) {
+    ld rh = w[0];  ld vn = w[1];  ld P = w[4];
     if (rh <= 0) {
         cout << "RANGE-ERROR::getEigenHD:: rho <= 0" << endl; return false;
     }
     if (P <= 1e-6) {
         cout << "RANGE-ERROR::getEigenHD:: P <= 1e-6" << endl; return false;
     }
-    long double a2 = gamma*P/rh; long double a = sqrtl(a2);
+    ld a2 = gamma*P/rh; ld a = sqrtl(a2);
 
     eigen[0] = vn - a;
     eigen[1] = vn; eigen[2] = vn; eigen[3] = vn;
@@ -66,28 +66,28 @@ bool getEigenHD(long double *w, long double *eigen, long double L[][5], long dou
 /// <param name="L">The matrix whose rows are the left eigenvectors.</param>
 /// <param name="R">The matrix whose columns are the right eigenvectors.</param>
 /// <returns>Has the computation worked ?</returns>
-bool getEigen(long double *w, long double *eigen, long double L[][7], long double R[][7]) {
+bool getEigen(ld *w, ld *eigen, ld L[][7], ld R[][7]) {
 
     //0) Shortcuts for the variables.
-    long double rh = w[0]; long double vn = w[1]; long double P = w[4]; long double rtrh = sqrtl(rh);
-    long double B1 = w[5]; long double B2 = w[6]; long double Bn = w[7];
-    long double b1 = B1/rtrh; long double b2 = B2/rtrh; long double bn = b1/rtrh;
+    ld rh = w[0]; ld vn = w[1]; ld P = w[4]; ld rtrh = sqrtl(rh);
+    ld B1 = w[5]; ld B2 = w[6]; ld Bn = w[7];
+    ld b1 = B1/rtrh; ld b2 = B2/rtrh; ld bn = b1/rtrh;
 
 
     //1) Compute some reused values.
-    long double Sn = Sgn(Bn);
+    ld Sn = Sgn(Bn);
 
-    long double a2 = gamma*P/rh; long double a = sqrtl(a2); if (isnan(a)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed a is NaN: a2 = " << a2 << endl;
-    long double CAn2 = Bn*Bn/rh; long double CAn = sqrtl(CAn2); if (isnan(CAn)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed CAn is NaN: CAn2 = " << CAn2 << endl;
-    long double CA2 = (Bn*Bn+B1*B1+B2*B2)/rh; long double CA = sqrtl(CA2); if (isnan(CA)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed CA is NaN: CA2 = " << CA2 << endl;
-    long double Cf2 = 0.5*(  (a2+CA2) + sqrtl(powl(a2+CA2, 2) - 4*a2*CAn2)  ); long double Cf = sqrtl(Cf2); if (isnan(Cf)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed Cf is NaN: Cf2 = " << Cf2 << endl;
-    long double Cs2 = 0.5*(  (a2+CA2) - sqrtl(powl(a2+CA2, 2) - 4*a2*CAn2)  ); long double Cs = sqrtl(Cs2); if (isnan(Cs)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed Cs is NaN: Cs2 = " << Cs2 << endl;
+    ld a2 = gamma*P/rh; ld a = sqrtl(a2); if (isnan(a)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed a is NaN: a2 = " << a2 << endl;
+    ld CAn2 = Bn*Bn/rh; ld CAn = sqrtl(CAn2); if (isnan(CAn)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed CAn is NaN: CAn2 = " << CAn2 << endl;
+    ld CA2 = (Bn*Bn+B1*B1+B2*B2)/rh; ld CA = sqrtl(CA2); if (isnan(CA)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed CA is NaN: CA2 = " << CA2 << endl;
+    ld Cf2 = 0.5*(  (a2+CA2) + sqrtl(powl(a2+CA2, 2) - 4*a2*CAn2)  ); ld Cf = sqrtl(Cf2); if (isnan(Cf)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed Cf is NaN: Cf2 = " << Cf2 << endl;
+    ld Cs2 = 0.5*(  (a2+CA2) - sqrtl(powl(a2+CA2, 2) - 4*a2*CAn2)  ); ld Cs = sqrtl(Cs2); if (isnan(Cs)) cout << "NaN::EIGENVALUES.H::getEigen:: wavespeed Cs is NaN: Cs2 = " << Cs2 << endl;
 
-    long double alf = sqrtl((a2 - Cs2)/(Cf2 - Cs2)); long double als = sqrtl((Cf2 - a2)/(Cf2 - Cs2));
+    ld alf = sqrtl((a2 - Cs2)/(Cf2 - Cs2)); ld als = sqrtl((Cf2 - a2)/(Cf2 - Cs2));
     //cout << alf*alf+als*als-1.0 << endl;
 
-    long double Bperp = sqrtl(B1*B1+B2*B2); long double bperp = Bperp/rtrh;
-    long double beta1 = B1/Bperp; long double beta2 = B2/Bperp;
+    ld Bperp = sqrtl(B1*B1+B2*B2); ld bperp = Bperp/rtrh;
+    ld beta1 = B1/Bperp; ld beta2 = B2/Bperp;
 
     if (null(Bperp) && !null(Bn)) {
         beta1 = 1.0/sqrtl(2.0); beta2 = 1.0/sqrtl(2.0);
@@ -121,7 +121,7 @@ bool getEigen(long double *w, long double *eigen, long double L[][7], long doubl
 
     if (null(fabsl(bn)-a) && null(Bperp)) { //magnetosonic case
         Cf2 = a2; Cf = a; Cs2 = a2; Cs = a;
-        long double phi = atanl( Bperp/(fabsl(bn)-a) );
+        ld phi = atanl( Bperp/(fabsl(bn)-a) );
         //alf = sinl(phi/2.0) + 
         cout << "Magnetosonic case" << endl;
     }
@@ -133,10 +133,10 @@ bool getEigen(long double *w, long double *eigen, long double L[][7], long doubl
         cout << "B(Bn, B1, B2) = " << Bn << ", " << B1 << ", " << B2 << endl;
     }
 
-    long double Cff = Cf*alf; long double Css = Cs*als;
-    long double Qf = Cf*alf*Sn; long double Qs = Cs*als*Sn;
-    long double Af = a*alf*rtrh; long double As = a*als*rtrh;
-    long double N = 0.5/a2;
+    ld Cff = Cf*alf; ld Css = Cs*als;
+    ld Qf = Cf*alf*Sn; ld Qs = Cs*als*Sn;
+    ld Af = a*alf*rtrh; ld As = a*als*rtrh;
+    ld N = 0.5/a2;
 
 
     //2) Compute the eigenvalues
@@ -203,63 +203,63 @@ bool getEigen(long double *w, long double *eigen, long double L[][7], long doubl
 
 
 
-bool getXEigenvalues(long double u_L[8], long double u_R[8], long double *eigen) // --OK--
+bool getXEigenvalues(ld u_L[8], ld u_R[8], ld *eigen) // --OK--
 {
     
 
 
     /// 0. Variables used later
-    //long double rt4PI = sqrtl(4 * M_PI);
+    //ld rt4PI = sqrtl(4 * M_PI);
 
-    long double rho = sqrtl(u_L[0])*sqrtl(u_R[0]);
+    ld rho = sqrtl(u_L[0])*sqrtl(u_R[0]);
     if (rho <= 0 || u_R[0] <= 0 || u_L[0] <= 0) {
         cout << "SOLVER::EIGENVALUES::ERROR::The density is null or negative" << endl;
         return false;
     }
 
-    long double vx = (sqrtl(u_L[0])*u_L[1]/u_L[0] + sqrtl(u_R[0])*u_R[1]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double vy = (sqrtl(u_L[0])*u_L[2]/u_L[0] + sqrtl(u_R[0])*u_R[2]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double vz = (sqrtl(u_L[0])*u_L[3]/u_L[0] + sqrtl(u_R[0])*u_R[3]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double By = (sqrtl(u_L[0])*u_L[6] + sqrtl(u_R[0])*u_R[6]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double Bz = (sqrtl(u_L[0])*u_L[7] + sqrtl(u_R[0])*u_R[7]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double Bx = u_L[5];
+    ld vx = (sqrtl(u_L[0])*u_L[1]/u_L[0] + sqrtl(u_R[0])*u_R[1]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld vy = (sqrtl(u_L[0])*u_L[2]/u_L[0] + sqrtl(u_R[0])*u_R[2]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld vz = (sqrtl(u_L[0])*u_L[3]/u_L[0] + sqrtl(u_R[0])*u_R[3]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld By = (sqrtl(u_L[0])*u_L[6] + sqrtl(u_R[0])*u_R[6]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld Bz = (sqrtl(u_L[0])*u_L[7] + sqrtl(u_R[0])*u_R[7]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld Bx = u_L[5];
     
-    long double vL = sqrtl(powl(u_L[1]/u_L[0],2) + powl(u_L[2]/u_L[0],2) + powl(u_L[3]/u_L[0],2));
-    long double BL = sqrtl(u_L[5]*u_L[5] + u_L[6]*u_L[6] + u_L[7]*u_L[7]);
-    long double PL = (u_L[4] - u_L[0]*vL*vL/2 - BL*BL/2) * (gamma - 1);
+    ld vL = sqrtl(powl(u_L[1]/u_L[0],2) + powl(u_L[2]/u_L[0],2) + powl(u_L[3]/u_L[0],2));
+    ld BL = sqrtl(u_L[5]*u_L[5] + u_L[6]*u_L[6] + u_L[7]*u_L[7]);
+    ld PL = (u_L[4] - u_L[0]*vL*vL/2 - BL*BL/2) * (gamma - 1);
     if (PL < 0) {
         cout << "X-EIGENVALUES::WARNING::The pressure at left interface is negative: " << PL << endl; return false; }
-    long double HL = (u_L[4] + PL + BL*BL/2) / u_L[0];
+    ld HL = (u_L[4] + PL + BL*BL/2) / u_L[0];
 
-    long double vR = sqrtl(powl(u_R[1]/u_R[0], 2) + powl(u_R[2]/u_R[0], 2) + powl(u_R[3]/u_R[0], 2));
-    long double BR = sqrtl(u_R[5]*u_R[5] + u_R[6]*u_R[6] + u_R[7]*u_R[7]);
-    long double PR = (u_R[4] - u_R[0]*vR*vR/2 - BR*BR/2) * (gamma - 1);
+    ld vR = sqrtl(powl(u_R[1]/u_R[0], 2) + powl(u_R[2]/u_R[0], 2) + powl(u_R[3]/u_R[0], 2));
+    ld BR = sqrtl(u_R[5]*u_R[5] + u_R[6]*u_R[6] + u_R[7]*u_R[7]);
+    ld PR = (u_R[4] - u_R[0]*vR*vR/2 - BR*BR/2) * (gamma - 1);
     if (PR < 0) {
         cout << "X-EIGENVARUES::WARNING::The pressure at left interface is negative: " << PR << endl; return false;
     }
-    long double HR = (u_R[4] + PR + BR*BR/2) / u_R[0];
+    ld HR = (u_R[4] + PR + BR*BR/2) / u_R[0];
 
-    long double H = (sqrtl(u_L[0])*HL + sqrtl(u_R[0])*HR) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double v = sqrtl(vx*vx + vy*vy + vz*vz); long double B = sqrtl(Bx*Bx + By*By + Bz*Bz);
+    ld H = (sqrtl(u_L[0])*HL + sqrtl(u_R[0])*HR) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld v = sqrtl(vx*vx + vy*vy + vz*vz); ld B = sqrtl(Bx*Bx + By*By + Bz*Bz);
 
     
     
 
     ///1. Compute in preparation for interface wavespeeds
-    long double X = (powl(u_L[6]-u_R[6], 2) + powl(u_L[7]-u_R[7], 2)) / (2*(sqrtl(u_L[0]) + sqrtl(u_R[0])));
+    ld X = (powl(u_L[6]-u_R[6], 2) + powl(u_L[7]-u_R[7], 2)) / (2*(sqrtl(u_L[0]) + sqrtl(u_R[0])));
     //if (isnan(X)) cout << "Solver: X is NaN" << endl;
-    long double Y = (u_L[0] + u_R[0]) / (2*rho);  if (isnan(Y)) cout << "Solver: Y is NaN" << endl;
-    long double _gamma = gamma - 1;
-    long double _X = (gamma - 2) * X; long double _Y = (gamma - 2) * Y; // < 0
+    ld Y = (u_L[0] + u_R[0]) / (2*rho);  if (isnan(Y)) cout << "Solver: Y is NaN" << endl;
+    ld _gamma = gamma - 1;
+    ld _X = (gamma - 2) * X; ld _Y = (gamma - 2) * Y; // < 0
 
     ///2. Compute the interface wavespeeds
-    long double b_perp = sqrtl((_gamma - _Y)*(By*By+Bz*Bz)); if (isnan(b_perp)) { cout << "Solver: b_perp is NaN" << endl; return false; }
-    long double CAx = sqrtl(Bx*Bx/rho);
-    long double tCA = sqrtl(CAx*CAx + b_perp*b_perp/rho); if (isnan(tCA)) { cout << "Solver: tCA is NaN" << endl; return false; }
-    long double ta = sqrtl(_gamma*(H-v*v/2-B*B/rho) - _X); if (isnan(ta)) { cout << "Solver: ta is NaN" << endl; return false; }
+    ld b_perp = sqrtl((_gamma - _Y)*(By*By+Bz*Bz)); if (isnan(b_perp)) { cout << "Solver: b_perp is NaN" << endl; return false; }
+    ld CAx = sqrtl(Bx*Bx/rho);
+    ld tCA = sqrtl(CAx*CAx + b_perp*b_perp/rho); if (isnan(tCA)) { cout << "Solver: tCA is NaN" << endl; return false; }
+    ld ta = sqrtl(_gamma*(H-v*v/2-B*B/rho) - _X); if (isnan(ta)) { cout << "Solver: ta is NaN" << endl; return false; }
 
-    long double Cs = sqrtl(0.5*((ta*ta+tCA*tCA) - sqrtl(powl(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAx*CAx)));
-    long double Cf = sqrtl(0.5*((ta*ta+tCA*tCA) + sqrtl(powl(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAx*CAx)));
+    ld Cs = sqrtl(0.5*((ta*ta+tCA*tCA) - sqrtl(powl(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAx*CAx)));
+    ld Cf = sqrtl(0.5*((ta*ta+tCA*tCA) + sqrtl(powl(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAx*CAx)));
 
     //if ((ta*ta+tCA*tCA) - sqrtl(pow(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAx*CAx) < 0) cout << "Solver: Cs is going to be NaN" << endl;
     //if (pow(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAx*CAx < 0) cout << "Solver: Cs and Cf are going to be NaN" << endl;
@@ -276,56 +276,56 @@ bool getXEigenvalues(long double u_L[8], long double u_R[8], long double *eigen)
 }
 
 
-bool getYEigenvalues(long double u_L[8], long double u_R[8], long double *eigen)
+bool getYEigenvalues(ld u_L[8], ld u_R[8], ld *eigen)
 {
-    long double rho = sqrtl(u_L[0])*sqrtl(u_R[0]);
+    ld rho = sqrtl(u_L[0])*sqrtl(u_R[0]);
     if (rho <= 0 || u_R[0] <= 0 || u_L[0] <= 0) {
         cout << "SOLVER::EIGENVALUES::ERROR::The density is null or negative" << endl;
         return false;
     }
 
-    long double vx = (sqrtl(u_L[0])*u_L[1]/u_L[0] + sqrtl(u_R[0])*u_R[1]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double vy = (sqrtl(u_L[0])*u_L[2]/u_L[0] + sqrtl(u_R[0])*u_R[2]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double vz = (sqrtl(u_L[0])*u_L[3]/u_L[0] + sqrtl(u_R[0])*u_R[3]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double Bx = (sqrtl(u_L[0])*u_L[5] + sqrtl(u_R[0])*u_R[5]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double Bz = (sqrtl(u_L[0])*u_L[7] + sqrtl(u_R[0])*u_R[7]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double By = u_L[6];
+    ld vx = (sqrtl(u_L[0])*u_L[1]/u_L[0] + sqrtl(u_R[0])*u_R[1]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld vy = (sqrtl(u_L[0])*u_L[2]/u_L[0] + sqrtl(u_R[0])*u_R[2]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld vz = (sqrtl(u_L[0])*u_L[3]/u_L[0] + sqrtl(u_R[0])*u_R[3]/u_R[0]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld Bx = (sqrtl(u_L[0])*u_L[5] + sqrtl(u_R[0])*u_R[5]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld Bz = (sqrtl(u_L[0])*u_L[7] + sqrtl(u_R[0])*u_R[7]) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld By = u_L[6];
 
-    long double vL = sqrtl(powl(u_L[1]/u_L[0], 2) + powl(u_L[2]/u_L[0], 2) + powl(u_L[3]/u_L[0], 2));
-    long double BL = sqrtl(u_L[5]*u_L[5] + u_L[6]*u_L[6] + u_L[7]*u_L[7]);
-    long double PL = (u_L[4] - u_L[0]*vL*vL/2 - BL*BL/2) * (gamma - 1);
+    ld vL = sqrtl(powl(u_L[1]/u_L[0], 2) + powl(u_L[2]/u_L[0], 2) + powl(u_L[3]/u_L[0], 2));
+    ld BL = sqrtl(u_L[5]*u_L[5] + u_L[6]*u_L[6] + u_L[7]*u_L[7]);
+    ld PL = (u_L[4] - u_L[0]*vL*vL/2 - BL*BL/2) * (gamma - 1);
     if (PL < 0) {
         cout << "X-EIGENVALUES::WARNING::The pressure at left interface is negative: " << PL << endl; return false;
     }
-    long double HL = (u_L[4] + PL + BL*BL/2) / u_L[0];
+    ld HL = (u_L[4] + PL + BL*BL/2) / u_L[0];
 
-    long double vR = sqrtl(powl(u_R[1]/u_R[0], 2) + powl(u_R[2]/u_R[0], 2) + powl(u_R[3]/u_R[0], 2));
-    long double BR = sqrtl(u_R[5]*u_R[5] + u_R[6]*u_R[6] + u_R[7]*u_R[7]);
-    long double PR = (u_R[4] - u_R[0]*vR*vR/2 - BR*BR/2) * (gamma - 1);
+    ld vR = sqrtl(powl(u_R[1]/u_R[0], 2) + powl(u_R[2]/u_R[0], 2) + powl(u_R[3]/u_R[0], 2));
+    ld BR = sqrtl(u_R[5]*u_R[5] + u_R[6]*u_R[6] + u_R[7]*u_R[7]);
+    ld PR = (u_R[4] - u_R[0]*vR*vR/2 - BR*BR/2) * (gamma - 1);
     if (PR < 0) {
         cout << "X-EIGENVARUES::WARNING::The pressure at left interface is negative: " << PR << endl; return false;
     }
-    long double HR = (u_R[4] + PR + BR*BR/2) / u_R[0];
+    ld HR = (u_R[4] + PR + BR*BR/2) / u_R[0];
 
-    long double H = (sqrtl(u_L[0])*HL + sqrtl(u_R[0])*HR) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
-    long double v = sqrtl(vx*vx + vy*vy + vz*vz); long double B = sqrtl(Bx*Bx + By*By + Bz*Bz);
+    ld H = (sqrtl(u_L[0])*HL + sqrtl(u_R[0])*HR) / (sqrtl(u_L[0]) + sqrtl(u_R[0]));
+    ld v = sqrtl(vx*vx + vy*vy + vz*vz); ld B = sqrtl(Bx*Bx + By*By + Bz*Bz);
 
 
     ///1. Compute in preparation for interface wavespeeds
-    long double X = (powl(u_L[5]-u_R[5], 2) + powl(u_L[7]-u_R[7], 2)) / (2*(sqrtl(u_L[0]) + sqrtl(u_R[0])));
+    ld X = (powl(u_L[5]-u_R[5], 2) + powl(u_L[7]-u_R[7], 2)) / (2*(sqrtl(u_L[0]) + sqrtl(u_R[0])));
     if (isnan(X)) cout << "Solver: X is NaN" << endl;
-    long double Y = (u_L[0] + u_R[0]) / (2*rho);  if (isnan(Y)) cout << "Solver: Y is NaN" << endl;
-    long double _gamma = gamma - 1;
-    long double _X = (gamma - 2) * X; long double _Y = (gamma - 2) * Y; // < 0
+    ld Y = (u_L[0] + u_R[0]) / (2*rho);  if (isnan(Y)) cout << "Solver: Y is NaN" << endl;
+    ld _gamma = gamma - 1;
+    ld _X = (gamma - 2) * X; ld _Y = (gamma - 2) * Y; // < 0
 
     ///2. Compute the interface wavespeeds
-    long double b_perp = sqrtl((_gamma - _Y)*(Bx*Bx+Bz*Bz)); if (isnan(b_perp)) { cout << "Solver: b_perp is NaN" << endl; return false; }
-    long double CAy = sqrtl(By*By/rho);
-    long double tCA = sqrtl(CAy*CAy + b_perp*b_perp/rho); if (isnan(tCA)) { cout << "Solver: tCA is NaN" << endl; return false; }
-    long double ta = sqrtl(_gamma*(H-v*v/2-B*B/rho) - _X); if (isnan(ta)) { cout << "Solver: ta is NaN" << endl; return false; }
+    ld b_perp = sqrtl((_gamma - _Y)*(Bx*Bx+Bz*Bz)); if (isnan(b_perp)) { cout << "Solver: b_perp is NaN" << endl; return false; }
+    ld CAy = sqrtl(By*By/rho);
+    ld tCA = sqrtl(CAy*CAy + b_perp*b_perp/rho); if (isnan(tCA)) { cout << "Solver: tCA is NaN" << endl; return false; }
+    ld ta = sqrtl(_gamma*(H-v*v/2-B*B/rho) - _X); if (isnan(ta)) { cout << "Solver: ta is NaN" << endl; return false; }
 
-    long double Cs = sqrtl(0.5*((ta*ta+tCA*tCA) - sqrtl(powl(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAy*CAy)));
-    long double Cf = sqrtl(0.5*((ta*ta+tCA*tCA) + sqrtl(powl(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAy*CAy)));
+    ld Cs = sqrtl(0.5*((ta*ta+tCA*tCA) - sqrtl(powl(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAy*CAy)));
+    ld Cf = sqrtl(0.5*((ta*ta+tCA*tCA) + sqrtl(powl(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAy*CAy)));
 
     //if ((ta*ta+tCA*tCA) - sqrtl(pow(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAy*CAy) < 0) cout << "Solver: Cs is going to be NaN" << endl;
     //if (pow(ta*ta+tCA*tCA, 2) - 4*ta*ta*CAy*CAy < 0) cout << "Solver: Cs and Cf are going to be NaN" << endl;

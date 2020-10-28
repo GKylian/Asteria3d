@@ -1,0 +1,64 @@
+_Comments_
+<description> = <These are the parameters for the 1d Sod simulation. We specify the values at the left and right sides of the interface, as well as the position of the interface.>
+<problem header> = <probs/shocktube.h>
+<recommended setup configuration> = <Adiabatic, no MHD or MHD, recontruction in characteristic variables, characteristic tracing>
+
+
+_domain_
+
+<Nx> = <1>
+<Ny> = <1>
+<Nz> = <512>
+<x0> = <-0.5>
+<xn> = <0.5>
+<y0> = <-0.5>
+<yn> = <0.5>
+<z0> = <-0.5>
+<zn> = <0.5>
+<BCxin> = <outflow>
+<BCxout> = <outflow>
+<BCyin> = <outflow>
+<BCyout> = <outflow>
+<BCzin> = <outflow>
+<BCzout> = <outflow>
+
+
+_simulation_
+
+<t0> = <0.0>
+<tn> = <0.2>
+<CFL> = <0.3>
+
+
+_problem_
+
+<interface> = <0.0>
+<direction> = <2>
+<gamma> = <1.4>
+
+
+<rhoL> = <1.0>
+<vxL> = <0.0>
+<vyL> = <0.0>
+<vzL> = <0.0>
+<PL> = <1.0>
+<BxL> = <0.0>
+<ByL> = <0.0>
+<BzL> = <0.0>
+
+<rhoR> = <0.125>
+<vxR> = <0.0>
+<vyR> = <0.0>
+<vzR> = <0.0>
+<PR> = <0.1>
+<BxR> = <0.0>
+<ByR> = <0.0>
+<BzR> = <0.0>
+
+_out:0_
+<name> = <dens>
+<format> = <csv>
+<dt> = <0.01>
+<ghosts> = <false>
+<var0> = <density>
+

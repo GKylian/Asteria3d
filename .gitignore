@@ -343,3 +343,5 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/Plots/RT 100x300.avi
+/Tests/MHD old

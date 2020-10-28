@@ -9,7 +9,7 @@
 
 bool PCM(Arrays *u, int i, int j, int k) {
     int iR = 2*i; int iL = 2*i+1; int jR = 2*j; int jL = 2*j+1; int kR = 2*k; int kL = 2*k+1; //interface indices of the right (i-1/2) and left (i+1/2) interfaces (in the cell i, j, k)
-    
+    ld gamma = u->gamma;
 
     if (u->Nx > 1) {
         for (int n = 0; n < NVAL; n++) 

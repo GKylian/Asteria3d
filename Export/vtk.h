@@ -99,14 +99,14 @@ bool vtk_add(Arrays *u, bool ghosts, exports out, string fname)
 		}
 	}
 #ifdef MHD
-	long double maxDiv = 0.0;
+	ld maxDiv = 0.0;
 	if (out == exports::DIVB) {
 		/* Write the scalar each line */
 		for(int k = kmin; k <= kmax; k++)
 		for(int j = jmin; j <= jmax; j++)
 		for(int i = imin; i <= imax; i++)
 		{
-			long double DivB = getDiv(u, i, j, k);
+			ld DivB = getDiv(u, i, j, k);
 			vtk << DivB << endl;
 			if (fabsl(DivB)>fabsl(maxDiv))
 				maxDiv = DivB;

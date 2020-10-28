@@ -176,8 +176,13 @@
     <ClInclude Include="old\Waves.h" />
     <ClInclude Include="primBounds.h" />
     <ClInclude Include="prob.h" />
+    <ClInclude Include="probs\blast.h" />
+    <ClInclude Include="probs\currentsheet.h" />
+    <ClInclude Include="probs\loops.h" />
     <ClInclude Include="probs\otvortex.h" />
-    <ClInclude Include="probs\sod.h" />
+    <ClInclude Include="probs\rtinstability.h" />
+    <ClInclude Include="probs\shocktube.h" />
+    <ClInclude Include="readParams.h" />
     <ClInclude Include="Reconstruction\eigen.h" />
     <ClInclude Include="Reconstruction\pcm.h" />
     <ClInclude Include="Reconstruction\plm.h" />

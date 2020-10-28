@@ -11,49 +11,50 @@ bool PLM(Arrays *u, int i, int j, int k) {
     int nx = u->Nx; int ny = u->Ny; int nz = u->Nz;
     int iR = 2*i; int iL = 2*i+1; int jR = 2*j; int jL = 2*j+1; int kR = 2*k; int kL = 2*k+1; //interface indices of the right (i-1/2) and left (i+1/2) interfaces (in the cell i, j, k)
     int iBx = NVAL-3; int iBy = NVAL-2; int iBz = NVAL-1;
-    ld gamma = u->gamma;
+    long double gamma = u->gamma;
 
     
     /* ----- 0. Initialize all the values, arrays and matrices ----- */
 
     /* Arrays holding the primitive values of the cell and its neighbors */
-    ld wi[NVAL] = { 0 }; ld wip[NVAL] = { 0 }; ld wim[NVAL] = { 0 };
-    ld wj[NVAL] = { 0 }; ld wjp[NVAL] = { 0 }; ld wjm[NVAL] = { 0 };
-    ld wk[NVAL] = { 0 }; ld wkp[NVAL] = { 0 }; ld wkm[NVAL] = { 0 };
+    long double wi[NVAL] = { 0 }; long double wip[NVAL] = { 0 }; long double wim[NVAL] = { 0 };
+    long double wj[NVAL] = { 0 }; long double wjp[NVAL] = { 0 }; long double wjm[NVAL] = { 0 };
+    long double wk[NVAL] = { 0 }; long double wkp[NVAL] = { 0 }; long double wkm[NVAL] = { 0 };
 
     /* Arrays and matrices holding the eigenvalues and the left/right eigenvectors */
-    ld eigen_x[NWAVE] = { 0 }; ld eigen_y[NWAVE] = { 0 }; ld eigen_z[NWAVE] = { 0 };
-    ld Lx[NWAVE][NWAVE] = { 0 }; ld Rx[NWAVE][NWAVE] = { 0 };
-    ld Ly[NWAVE][NWAVE] = { 0 }; ld Ry[NWAVE][NWAVE] = { 0 };
-    ld Lz[NWAVE][NWAVE] = { 0 }; ld Rz[NWAVE][NWAVE] = { 0 };
+    long double eigen_x[NWAVE] = { 0 }; long double eigen_y[NWAVE] = { 0 }; long double eigen_z[NWAVE] = { 0 };
+    long double Lx[NWAVE][NWAVE] = { 0 }; long double Rx[NWAVE][NWAVE] = { 0 };
+    long double Ly[NWAVE][NWAVE] = { 0 }; long double Ry[NWAVE][NWAVE] = { 0 };
+    long double Lz[NWAVE][NWAVE] = { 0 }; long double Rz[NWAVE][NWAVE] = { 0 };
 
     /* The left, center and right differences in primitive variables */
-    ld dwL_x[NWAVE] = { 0 }; ld dwR_x[NWAVE] = { 0 }; ld dwC_x[NWAVE] = { 0 }; ld dwg_x[NWAVE] = { 0 };
-    ld dwL_y[NWAVE] = { 0 }; ld dwR_y[NWAVE] = { 0 }; ld dwC_y[NWAVE] = { 0 }; ld dwg_y[NWAVE] = { 0 };
-    ld dwL_z[NWAVE] = { 0 }; ld dwR_z[NWAVE] = { 0 }; ld dwC_z[NWAVE] = { 0 }; ld dwg_z[NWAVE] = { 0 };
+    long double dwL_x[NWAVE] = { 0 }; long double dwR_x[NWAVE] = { 0 }; long double dwC_x[NWAVE] = { 0 }; long double dwg_x[NWAVE] = { 0 };
+    long double dwL_y[NWAVE] = { 0 }; long double dwR_y[NWAVE] = { 0 }; long double dwC_y[NWAVE] = { 0 }; long double dwg_y[NWAVE] = { 0 };
+    long double dwL_z[NWAVE] = { 0 }; long double dwR_z[NWAVE] = { 0 }; long double dwC_z[NWAVE] = { 0 }; long double dwg_z[NWAVE] = { 0 };
 
 #ifdef CHAR
     /* The differences projected onto characteristic variables */
-    ld daL_x[NWAVE] = { 0 }; ld daR_x[NWAVE] = { 0 }; ld daC_x[NWAVE] = { 0 }; ld dag_x[NWAVE] = { 0 };
-    ld daL_y[NWAVE] = { 0 }; ld daR_y[NWAVE] = { 0 }; ld daC_y[NWAVE] = { 0 }; ld dag_y[NWAVE] = { 0 };
-    ld daL_z[NWAVE] = { 0 }; ld daR_z[NWAVE] = { 0 }; ld daC_z[NWAVE] = { 0 }; ld dag_z[NWAVE] = { 0 };
+    long double daL_x[NWAVE] = { 0 }; long double daR_x[NWAVE] = { 0 }; long double daC_x[NWAVE] = { 0 };
+    long double daL_y[NWAVE] = { 0 }; long double daR_y[NWAVE] = { 0 }; long double daC_y[NWAVE] = { 0 };
+    long double daL_z[NWAVE] = { 0 }; long double daR_z[NWAVE] = { 0 }; long double daC_z[NWAVE] = { 0 };
 
     /* The differences with monotonicity constraints applied */
-    ld da_x[NWAVE] = { 0 }; ld da_y[NWAVE] = { 0 }; ld da_z[NWAVE] = { 0 };
+    long double da_x[NWAVE] = { 0 }; long double da_y[NWAVE] = { 0 }; long double da_z[NWAVE] = { 0 };
 #endif // CHAR
     
     /* The differences projected back onto primitive variables */
-    ld dw_x[NWAVE] = { 0 }; ld dw_y[NWAVE] = { 0 }; ld dw_z[NWAVE] = { 0 };
+    long double dw_x[NWAVE] = { 0 }; long double dw_y[NWAVE] = { 0 }; long double dw_z[NWAVE] = { 0 };
 
 
-    //FIXME: cout << "\tLoading the primitive values" << endl;
+
     /* ----- 1. Load the primitive values to the local arrays ----- */
     /* The order should be (rho, vn, v1, v2, P, B1, B2, Bn) */
-    if (nx > 1) {  for (int n = 0; n < NVAL; n++) { wi[n] = u->uP(n, i, j, k);  wip[n] = u->uP(n, i+1, j, k);  wim[n] = u->uP(n, i-1, j, k); }  }
-    if (ny > 1) {  for (int n = 0; n < NVAL; n++) { wj[n] = u->uP(n, i, j, k);  wjp[n] = u->uP(n, i, j+1, k);  wjm[n] = u->uP(n, i, j-1, k); }  }
-    if (nz > 1) {  for (int n = 0; n < NVAL; n++) { wk[n] = u->uP(n, i, j, k);  wkp[n] = u->uP(n, i, j, k+1);  wkm[n] = u->uP(n, i, j, k-1); }  }
-
-    if (nx > 1 && (wi[0] <= 0 || wip[0] <= 0 || wim[0] <= 0)) {
+    for (int n = 0; n < NVAL; n++) {
+        wi[n] = u->uP(n, i, j, k);    wip[n] = u->uP(n, i+1, j, k);    wim[n] = u->uP(n, i-1, j, k);
+        wj[n] = u->uP(n, i, j, k);    wjp[n] = u->uP(n, i, j+1, k);    wjm[n] = u->uP(n, i, j-1, k);
+        wk[n] = u->uP(n, i, j, k);    wkp[n] = u->uP(n, i, j, k+1);    wkm[n] = u->uP(n, i, j, k-1);
+    }
+    if (wi[0] <= 0 || wip[0] <= 0 || wim[0] <= 0) {
         std::cout << "ERROR:::plm.h::PLM:: One of the input densities (i, i+1 or i-1) is null or negative: " << wi[0] << ", " << wip[0] << ", " << wim[0] << std::endl;
         return false;
     }
@@ -61,46 +62,38 @@ bool PLM(Arrays *u, int i, int j, int k) {
     /* Swap v and B to get the correct order */
     /* y: (vx, vy, vz) -> (vy, vx, vz)       z: (vx, vy, vz) -> (vz, vx, vy) */
     /* x: (Bx, By, Bz) -> (By, Bz, Bx)       y: (Bx, By, Bz) -> (Bx, Bz, By) */
-
-    if (nx>1) {
 #ifdef MHD
-        swap(wi[iBx], wi[iBz]); swap(wi[iBx], wi[iBy]);
-        swap(wip[iBx], wip[iBz]); swap(wip[iBx], wip[iBy]);
-        swap(wim[iBx], wim[iBz]); swap(wim[iBx], wim[iBy]);
+    swap( wi[iBx],  wi[iBz]); swap( wi[iBx],  wi[iBy]);
+    swap(wip[iBx], wip[iBz]); swap(wip[iBx], wip[iBy]);
+    swap(wim[iBx], wim[iBz]); swap(wim[iBx], wim[iBy]);
 #endif // MHD
-    }
-    if (ny>1) {
-        swap(wj[1], wj[2]);    swap(wjp[1], wjp[2]);    swap(wjm[1], wjm[2]);
+
+    swap(wj[1], wj[2]);    swap(wjp[1], wjp[2]);    swap(wjm[1], wjm[2]);
 
 #ifdef MHD
-        swap(wj[iBy], wj[iBz]);    swap(wjp[iBy], wjp[iBz]);    swap(wjm[iBy], wjm[iBz]);
+    swap(wj[iBy], wj[iBz]);    swap(wjp[iBy], wjp[iBz]);    swap(wjm[iBy], wjm[iBz]);
 #endif // MHD
-    }
-    if (nz>1) {
-        swap(wk[1], wk[3]); swap(wk[2], wk[3]);    swap(wkp[1], wkp[3]); swap(wkp[2], wkp[3]);    swap(wkm[1], wkm[3]); swap(wkm[2], wkm[3]);
-    }
+
+    swap(wk[1], wk[3]); swap(wk[2], wk[3]);    swap(wkp[1], wkp[3]); swap(wkp[2], wkp[3]);    swap(wkm[1], wkm[3]); swap(wkm[2], wkm[3]);
     
 
 
-    //FIXME: cout << "\tComputing the eigenvectors and eigenvalues" << endl;
     /* ----- 2. Compute and store the eigenvectors and eigenvalues, as well as the min/max eigenvalues ----- */
     if (nx > 1) { if (!getEigen(wi, eigen_x, Lx, Rx, gamma)) { std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'x' direction." << std::endl; return false; } }
     if (ny > 1) { if (!getEigen(wj, eigen_y, Ly, Ry, gamma)) { std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'y' direction." << std::endl; return false; } }
     if (nz > 1) { if (!getEigen(wk, eigen_z, Lz, Rz, gamma)) { std::cout << "plm.h::PLM:: Could not compute eigenvalues and eigenvectors in the 'z' direction." << std::endl; return false; } }
 
-    ld eigM_x = (ld)*max_element(eigen_x, eigen_x+NWAVE); ld eig0_x = (ld)*min_element(eigen_x, eigen_x+NWAVE);
-    ld eigM_y = (ld)*max_element(eigen_y, eigen_y+NWAVE); ld eig0_y = (ld)*min_element(eigen_y, eigen_y+NWAVE);
-    ld eigM_z = (ld)*max_element(eigen_z, eigen_z+NWAVE); ld eig0_z = (ld)*min_element(eigen_z, eigen_z+NWAVE);
+    long double eigM_x = (long double)*max_element(eigen_x, eigen_x+NWAVE); long double eig0_x = (long double)*min_element(eigen_x, eigen_x+NWAVE);
+    long double eigM_y = (long double)*max_element(eigen_y, eigen_y+NWAVE); long double eig0_y = (long double)*min_element(eigen_y, eigen_y+NWAVE);
+    long double eigM_z = (long double)*max_element(eigen_z, eigen_z+NWAVE); long double eig0_z = (long double)*min_element(eigen_z, eigen_z+NWAVE);
 
 
 
 
-    //FIXME:cout << "\tComputing the left, right and centered differences in primitive variables." << endl;
     /* ----- 3. Compute the left, right and centered differences in primitive variables. ----- */
-    if (nx > 1) {    for (int n = 0; n < NWAVE; n++) { dwL_x[n] = wi[n]-wim[n];   dwR_x[n] = wip[n]-wi[n];   dwC_x[n] = wip[n]-wim[n];   dwg_x[n] = (dwL_x[n]*dwR_x[n]>0.0)*2.0*dwL_x[n]*dwR_x[n]/(dwL_x[n]+dwR_x[n]);}    }
-    if (ny > 1) {    for (int n = 0; n < NWAVE; n++) { dwL_y[n] = wj[n]-wjm[n];   dwR_y[n] = wjp[n]-wj[n];   dwC_y[n] = wjp[n]-wjm[n];   dwg_y[n] = (dwL_y[n]*dwR_y[n]>0.0)*2.0*dwL_y[n]*dwR_y[n]/(dwL_y[n]+dwR_y[n]);}    }
-    if (nz > 1) {    for (int n = 0; n < NWAVE; n++) { dwL_z[n] = wk[n]-wkm[n];   dwR_z[n] = wkp[n]-wk[n];   dwC_z[n] = wkp[n]-wkm[n];   dwg_z[n] = (dwL_z[n]*dwR_z[n]>0.0)*2.0*dwL_z[n]*dwR_z[n]/(dwL_z[n]+dwR_z[n]);}    }
-
+    if (nx > 1) {    for (int n = 0; n < NWAVE; n++) { dwL_x[n] = wi[n]-wim[n];   dwR_x[n] = wip[n]-wi[n];   dwC_x[n] = (wip[n]-wim[n])/2.0;}    }
+    if (ny > 1) {    for (int n = 0; n < NWAVE; n++) { dwL_y[n] = wj[n]-wjm[n];   dwR_y[n] = wjp[n]-wj[n];   dwC_y[n] = (wjp[n]-wjm[n])/2.0;}    }
+    if (nz > 1) {    for (int n = 0; n < NWAVE; n++) { dwL_z[n] = wk[n]-wkm[n];   dwR_z[n] = wkp[n]-wk[n];   dwC_z[n] = (wkp[n]-wkm[n])/2.0;}    }
 
 
 
@@ -108,21 +101,21 @@ bool PLM(Arrays *u, int i, int j, int k) {
 #ifdef CHAR
     /* ----- 4. Project the differences along the characteristics. ----- */
     if (nx > 1) {    for (int n = 0; n < NWAVE; n++) for (int m = 0; m < NWAVE; m++){
-                         daL_x[n] += Lx[n][m]*dwL_x[m]; daR_x[n] += Lx[n][m]*dwR_x[m]; daC_x[n] += Lx[n][m]*dwC_x[m]; dag_x[n] += Lx[n][m]*dwg_x[m]; }
+                         daL_x[n] += Lx[n][m]*dwL_x[m]; daR_x[n] += Lx[n][m]*dwR_x[m]; daC_x[n] += Lx[n][m]*dwC_x[m]; }
     }
     if (ny > 1) {    for (int n = 0; n < NWAVE; n++) for (int m = 0; m < NWAVE; m++){
-                         daL_y[n] += Ly[n][m]*dwL_y[m]; daR_y[n] += Ly[n][m]*dwR_y[m]; daC_y[n] += Ly[n][m]*dwC_y[m]; dag_y[n] += Ly[n][m]*dwg_y[m]; }
+                         daL_y[n] += Ly[n][m]*dwL_y[m]; daR_y[n] += Ly[n][m]*dwR_y[m]; daC_y[n] += Ly[n][m]*dwC_y[m]; }
     }
     if (nz > 1) {    for (int n = 0; n < NWAVE; n++) for (int m = 0; m < NWAVE; m++){
-                         daL_z[n] += Lz[n][m]*dwL_z[m]; daR_z[n] += Lz[n][m]*dwR_z[m]; daC_z[n] += Lz[n][m]*dwC_z[m]; dag_z[n] += Lz[n][m]*dwg_z[m]; }
+                         daL_z[n] += Lz[n][m]*dwL_z[m]; daR_z[n] += Lz[n][m]*dwR_z[m]; daC_z[n] += Lz[n][m]*dwC_z[m]; }
     }
 
 
 
     /* ----- 5. Apply the monotonicity constraints. ----- */
-    if (nx > 1) {    for (int n = 0; n < NWAVE; n++) { da_x[n] = (daR_x[n]*daL_x[n]>0)*sgn(daC_x[n])*fminl( 2.0*fminl(fabsl(daL_x[n]), fabsl(daR_x[n])), fminl(0.5*fabsl(daC_x[n]), fabsl(dag_x[n])) );  if (null(da_x[n])) da_x[n] = 0.0; }    } // 
-    if (ny > 1) {    for (int n = 0; n < NWAVE; n++) { da_y[n] = (daR_y[n]*daL_y[n]>0)*sgn(daC_y[n])*fminl( 2.0*fminl(fabsl(daL_y[n]), fabsl(daR_y[n])), fminl(0.5*fabsl(daC_y[n]), fabsl(dag_y[n])) );  if (null(da_y[n])) da_y[n] = 0.0; }    } // 
-    if (nz > 1) {    for (int n = 0; n < NWAVE; n++) { da_z[n] = (daR_z[n]*daL_z[n]>0)*sgn(daC_z[n])*fminl( 2.0*fminl(fabsl(daL_z[n]), fabsl(daR_z[n])), fminl(0.5*fabsl(daC_z[n]), fabsl(dag_z[n])) );  if (null(da_z[n])) da_z[n] = 0.0; }    } // 
+    if (nx > 1) {    for (int n = 0; n < NWAVE; n++) { da_x[n] = (daR_x[n]*daL_x[n]>0)*sgn(daC_x[n])*fminl(fminl(2.0*fabsl(daL_x[n]), 2.0*fabsl(daR_x[n])), fabsl(daC_x[n]));  if (null(da_x[n])) da_x[n] = 0.0; }    }
+    if (ny > 1) {    for (int n = 0; n < NWAVE; n++) { da_y[n] = (daR_y[n]*daL_y[n]>0)*sgn(daC_y[n])*fminl(fminl(2.0*fabsl(daL_y[n]), 2.0*fabsl(daR_y[n])), fabsl(daC_y[n]));  if (null(da_y[n])) da_y[n] = 0.0; }    }
+    if (nz > 1) {    for (int n = 0; n < NWAVE; n++) { da_z[n] = (daR_z[n]*daL_z[n]>0)*sgn(daC_z[n])*fminl(fminl(2.0*fabsl(daL_z[n]), 2.0*fabsl(daR_z[n])), fabsl(daC_z[n]));  if (null(da_z[n])) da_z[n] = 0.0; }    }
 
 
     /* ----- 6. Project back to the primitive variabkes. ----- */
@@ -137,17 +130,15 @@ bool PLM(Arrays *u, int i, int j, int k) {
     }
 
 #else
-    //FIXME:cout << "\tApplying the constraints on primitive variables" << endl;
     /* ----- 4-6. Apply the monotonicity constraints on primitive variables ----- */
-    if (nx > 1) { for (int n = 0; n < NWAVE; n++) { dw_x[n] = (dwR_x[n]*dwL_x[n]>0)*sgn(dwC_x[n])*fminl( 2.0*fminl(fabsl(dwL_x[n]), fabsl(dwR_x[n])), fminl(0.5*fabsl(dwC_x[n]), fabsl(dwg_x[n])) );  if (null(dw_x[n])) dw_x[n] = 0.0; } } // 
-    if (ny > 1) { for (int n = 0; n < NWAVE; n++) { dw_y[n] = (dwR_y[n]*dwL_y[n]>0)*sgn(dwC_y[n])*fminl( 2.0*fminl(fabsl(dwL_y[n]), fabsl(dwR_y[n])), fminl(0.5*fabsl(dwC_y[n]), fabsl(dwg_y[n])) );  if (null(dw_y[n])) dw_y[n] = 0.0; } } // 
-    if (nz > 1) { for (int n = 0; n < NWAVE; n++) { dw_z[n] = (dwR_z[n]*dwL_z[n]>0)*sgn(dwC_z[n])*fminl( 2.0*fminl(fabsl(dwL_z[n]), fabsl(dwR_z[n])), fminl(0.5*fabsl(dwC_z[n]), fabsl(dwg_z[n])) );  if (null(dw_z[n])) dw_z[n] = 0.0; } } // 
+    if (nx > 1) { for (int n = 0; n < NWAVE; n++) { dw_x[n] = (dwR_x[n]*dwL_x[n]>0)*sgn(dwC_x[n])*fminl(fminl(2.0*fabsl(dwL_x[n]), 2.0*fabsl(dwR_x[n])), fabsl(dwC_x[n]));  if (null(dw_x[n])) dw_x[n] = 0.0; } } // 
+    if (ny > 1) { for (int n = 0; n < NWAVE; n++) { dw_y[n] = (dwR_y[n]*dwL_y[n]>0)*sgn(dwC_y[n])*fminl(fminl(2.0*fabsl(dwL_y[n]), 2.0*fabsl(dwR_y[n])), fabsl(dwC_y[n]));  if (null(dw_y[n])) dw_y[n] = 0.0; } } // 
+    if (nz > 1) { for (int n = 0; n < NWAVE; n++) { dw_z[n] = (dwR_z[n]*dwL_z[n]>0)*sgn(dwC_z[n])*fminl(fminl(2.0*fabsl(dwL_z[n]), 2.0*fabsl(dwR_z[n])), fabsl(dwC_z[n]));  if (null(dw_z[n])) dw_z[n] = 0.0; } } // 
     //for (int n = 0; n < NWAVE; n++) { dw_x[n] = dwC_x[n]; }
 
 #endif // CHAR 
 
 
-    //FIXME:cout << "\tComputing the values at R(i-1/2) and L(i+1/2)." << endl;
     /* ----- 7. Compute the values at R(i-1/2) and L(i+1/2). ----- */
     if (nx > 1) { for(int n = 0; n < NWAVE; n++){
         u->ix(n, iR, j, k) = wi[n] - 0.5*dw_x[n];    u->ix(n, iL, j, k) = wi[n] + 0.5*dw_x[n];
@@ -199,7 +190,7 @@ bool PLM(Arrays *u, int i, int j, int k) {
 #ifdef TRACING
 
     if (nx > 1) {
-        ld qa = 0.0; ld qn;
+        long double qa = 0.0; long double qn;
         for (int n = 0; n < NWAVE; n++)
         {
             if (eigen_x[n] >= 0.0) {
@@ -241,7 +232,7 @@ bool PLM(Arrays *u, int i, int j, int k) {
         }
     }
     if (ny > 1) {
-        ld qa = 0.0; ld qn;
+        long double qa = 0.0; long double qn;
         for (int n = 0; n < NWAVE; n++)
         {
             if (eigen_y[n] >= 0.0) {
@@ -283,7 +274,7 @@ bool PLM(Arrays *u, int i, int j, int k) {
         }
     }
     if (nz > 1) {
-        ld qa = 0.0; ld qn;
+        long double qa = 0.0; long double qn;
         for (int n = 0; n < NWAVE; n++)
         {
             if (eigen_z[n] >= 0.0) {
@@ -338,21 +329,20 @@ bool PLM(Arrays *u, int i, int j, int k) {
 #endif // MHD
 
 
-    //FIXME: cout << "\tAdding the magnetic field source terms." << endl;
     /* ----- 9. Add magnetic field source terms ----- */
 #ifdef MHD
-    ld dBx = 0; if (u->Nx>1) dBx = (u->uC(iBx, i+1, j, k)-u->uC(iBx, i, j, k))/u->dx;
-    ld dBy = 0; if (u->Ny>1) dBy = (u->uC(iBy, i, j+1, k)-u->uC(iBy, i, j, k))/u->dy;
-    ld dBz = 0; if (u->Nz>1) dBz = (u->uC(iBz, i, j, k+1)-u->uC(iBz, i, j, k))/u->dz;
+    long double dBx = (u->uC(iBx, i+1, j, k)-u->uC(iBx, i, j, k))/u->dx;
+    long double dBy = (u->uC(iBy, i, j+1, k)-u->uC(iBy, i, j, k))/u->dy;
+    long double dBz = (u->uC(iBz, i, j, k+1)-u->uC(iBz, i, j, k))/u->dz;
 
-    ld dBy_x = -u->dt/2.0 * u->uP(2, i, j, k) * minmod(  (nz>1)*dBz, -(nx>1)*dBx  ); //Changed to By and Bz at the x interfaces
-    ld dBz_x = -u->dt/2.0 * u->uP(3, i, j, k) * minmod(  (ny>1)*dBy, -(nx>1)*dBx  );
+    long double dBy_x = -u->dt/2.0 * u->uP(2, i, j, k) * minmod(  (nz>1)*dBz, -(nx>1)*dBx  ); //Changed to By and Bz at the x interfaces
+    long double dBz_x = -u->dt/2.0 * u->uP(3, i, j, k) * minmod(  (ny>1)*dBy, -(nx>1)*dBx  );
 
-    ld dBz_y = -u->dt/2.0 * u->uP(3, i, j, k) * minmod(  (nx>1)*dBx, -(ny>1)*dBy  ); //Changed to Bx and Bz at the y interfaces
-    ld dBx_y = -u->dt/2.0 * u->uP(1, i, j, k) * minmod(  (nz>1)*dBz, -(ny>1)*dBy  );
+    long double dBz_y = -u->dt/2.0 * u->uP(3, i, j, k) * minmod(  (nx>1)*dBx, -(ny>1)*dBy  ); //Changed to Bx and Bz at the y interfaces
+    long double dBx_y = -u->dt/2.0 * u->uP(1, i, j, k) * minmod(  (nz>1)*dBz, -(ny>1)*dBy  );
 
-    ld dBx_z = -u->dt/2.0 * u->uP(1, i, j, k) * minmod(  (ny>1)*dBy, -(nz>1)*dBz  ); //Changed to Bx and Bz at the y interfaces.
-    ld dBy_z = -u->dt/2.0 * u->uP(2, i, j, k) * minmod(  (nx>1)*dBx, -(nz>1)*dBz  );
+    long double dBx_z = -u->dt/2.0 * u->uP(1, i, j, k) * minmod(  (ny>1)*dBy, -(nz>1)*dBz  ); //Changed to Bx and Bz at the y interfaces.
+    long double dBy_z = -u->dt/2.0 * u->uP(2, i, j, k) * minmod(  (nx>1)*dBx, -(nz>1)*dBz  );
 
     if (nx > 1) {
         u->ix(iBy, iR, j, k) += dBy_x;  u->ix(iBy, iL, j, k) += dBy_x;
@@ -370,17 +360,17 @@ bool PLM(Arrays *u, int i, int j, int k) {
     }
 #endif // MHD
 
-    //FIXME: cout << "\tAdding the gravity source terms." << endl;
+
     /* ----- 10. Add gravity source terms (static or potential) ----- */
     if (gx != 0.0 || gy != 0.0 || gz != 0.0) {
-        if (nx > 1) { u->ix(1, iR, j, k) -= u->dt/2.0 *gx; u->ix(1, iL, j, k) -= u->dt/2.0 *gx; }
-        if (ny > 1) { u->iy(2, i, jR, k) -= u->dt/2.0 *gy; u->iy(2, i, jL, k) -= u->dt/2.0 *gy; }
-        if (nz > 1) { u->iz(3, i, j, kR) -= u->dt/2.0 *gz; u->iz(3, i, j, kL) -= u->dt/2.0 *gz; }
+        if (nx > 1) { u->ix(1, iR, j, k) += u->dt/2.0 *gx; u->ix(1, iL, j, k) += u->dt/2.0 *gx; }
+        if (ny > 1) { u->iy(2, i, jR, k) += u->dt/2.0 *gy; u->iy(2, i, jL, k) += u->dt/2.0 *gy; }
+        if (nz > 1) { u->iz(3, i, j, kR) += u->dt/2.0 *gz; u->iz(3, i, j, kL) += u->dt/2.0 *gz; }
     } 
     else {
-        ld dpdx_p = (Phii(u, i+1, j, k)-Phii(u, i, j, k))/u->dx;   ld dpdx_m = (Phii(u, i, j, k)-Phii(u, i-1, j, k))/u->dx;
-        ld dpdy_p = (Phii(u, i, j+1, k)-Phii(u, i, j, k))/u->dy;   ld dpdy_m = (Phii(u, i, j, k)-Phii(u, i, j-1, k))/u->dy;
-        ld dpdz_p = (Phii(u, i, j, k+1)-Phii(u, i, j, k))/u->dz;   ld dpdz_m = (Phii(u, i, j, k)-Phii(u, i, j, k-1))/u->dz;
+        long double dpdx_p = (Phii(u, i+1, j, k)-Phii(u, i, j, k))/u->dx;   long double dpdx_m = (Phii(u, i, j, k)-Phii(u, i-1, j, k))/u->dx;
+        long double dpdy_p = (Phii(u, i, j+1, k)-Phii(u, i, j, k))/u->dy;   long double dpdy_m = (Phii(u, i, j, k)-Phii(u, i, j-1, k))/u->dy;
+        long double dpdz_p = (Phii(u, i, j, k+1)-Phii(u, i, j, k))/u->dz;   long double dpdz_m = (Phii(u, i, j, k)-Phii(u, i, j, k-1))/u->dz;
 
         if (nx > 1) { u->ix(1, iR, j, k) -= u->dt/2.0 *dpdx_m; u->ix(1, iL, j, k) -= u->dt/2.0 *dpdx_p; }
         if (ny > 1) { u->iy(2, i, jR, k) -= u->dt/2.0 *dpdy_m; u->iy(2, i, jL, k) -= u->dt/2.0 *dpdy_p; }
@@ -408,7 +398,7 @@ bool PLM(Arrays *u, int i, int j, int k) {
         }
     }
 
-    //FIXME: cout << "\tTransforming to conserved variables." << endl;
+
     /* ----- 12. Transform the interface values to conserved variables ----- */
     if (nx > 1) {
         if (!toConserved(u, 0, iR, j, k, gamma)) std::cout << "ERROR:::plm.h::PLM:: Transformation of intx (R) to conserved variables failed !" << std::endl;

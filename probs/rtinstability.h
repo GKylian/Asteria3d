@@ -41,7 +41,7 @@
 #endif // Iso
 
 #define gx 0.0
-#define gy 0.0
+#define gy 0.1
 #define gz 0.0
 
 ld Phi(ld x, ld y, ld z) {
@@ -94,12 +94,9 @@ bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fna
 
 	u->gamma = stod((*params)["problem"]["gamma"]); ld gamma = u->gamma;
 
-	ld rhoIn = stod((*params)["problem"]["rhoIn"]);
-	ld rhoOut = stod((*params)["problem"]["rhoOut"]);
-	ld PIn = stod((*params)["problem"]["PIn"]);
-	ld POut = stod((*params)["problem"]["POut"]);
-
-	ld radius = stod((*params)["problem"]["radius"]);
+	ld rhoUp = stod((*params)["problem"]["rhoUp"]);
+	ld rhoDown = stod((*params)["problem"]["rhoDown"]);
+	ld P0 = stod((*params)["problem"]["P0"]);
 	
 
 	/* Create the arrays */
@@ -117,27 +114,25 @@ bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fna
 		ld x = u->x0 + u->dx*(i-NGHOST);
 		ld y = u->y0 + u->dy*(j-NGHOST);
 		ld z = u->z0 + u->dz*(k-NGHOST);
-		ld r = sqrtl(x*x+y*y);
 
 		/* Cell interface coordinates */
 		ld ix = x - 0.5*u->dx; ld iy = y - 0.5*u->dy; ld iz = z - 0.5*u->dz;
 
 		/* Set HD variables as primitive variables */
 		
-		if (r < radius) {
-			u->uP(0, i, j, k) = rhoIn;
-			u->uP(4, i, j, k) = PIn;
-		}
-		else {
-			u->uP(0, i, j, k) = rhoOut;
-			u->uP(4, i, j, k) = POut;
-		}
-			
+		if (y > 0.0)
+			u->uP(0, i, j, k) = rhoUp;
+		else
+			u->uP(0, i, j, k) = rhoDown;
 
+		u->uP(4, i, j, k) = 1.0/gamma - gy*u->uP(0, i, j, k)*y;
 		u->uP(1, i, j, k) = 0.0; u->uP(2, i, j, k) = 0.0; u->uP(3, i, j, k) = 0.0;
 		
+		if(fabsl(y) < 0.3)
+			u->uP(2, i, j, k) = 0.0025*(1+cosl(4*M_PI*x))*(1+cosl(3*M_PI*y));
+
 #ifdef MHD
-		u->uC(5, i, j, k) = 1.0/sqrtl(2.0); u->uC(6, i, j, k) = 1.0/sqrtl(2.0); u->uC(7, i, j, k) = 0.0;
+		u->uC(5, i, j, k) = 0.0; u->uC(6, i, j, k) = 0.0; u->uC(7, i, j, k) = 0.0;
 #endif // MHD
 
 
@@ -240,7 +235,9 @@ bool ApplyBounds(Arrays *u) {
 	if (u->Nx > 1 && u->boundaries[1] != bounds::USER) bounds_xout(u);
 
 	if (u->Ny > 1 && u->boundaries[2] != bounds::USER) bounds_yin(u);
+	else if (u->Ny > 1 && u->boundaries[2] == bounds::USER) RTreflect_yin(u);
 	if (u->Ny > 1 && u->boundaries[3] != bounds::USER) bounds_yout(u);
+	else if (u->Ny > 1 && u->boundaries[3] == bounds::USER) RTreflect_yout(u);
 
 	if (u->Nz > 1 && u->boundaries[4] != bounds::USER) bounds_zin(u);
 	if (u->Nz > 1 && u->boundaries[5] != bounds::USER) bounds_zout(u);
@@ -266,4 +263,38 @@ bool ApplyBounds(Arrays *u) {
 
 
 
-/* ---------- Custom Boundary functions (if any) ---------- */
+/* ---------- Boundary functions (if any) ---------- */
+
+void RTreflect_yin(Arrays *u) {
+	/* Loop through the transverse dimensions (x,z) */
+	for(int k = u->k_dl; k <= u->k_dr; k++)
+	for(int i = u->i_dl; i <= u->i_dr; i++)
+	{
+		/* Loop through the ghost cells */
+		for (int j = 0; j < NGHOST; j++) {
+			u->uP(0, i, u->j_gl-j, k) = u->uP(0, i, u->j_cl+j, k);
+			u->uP(1, i, u->j_gl-j, k) = u->uP(1, i, u->j_cl+j, k); u->uP(3, i, u->j_gl-j, k) = u->uP(3, i, u->j_cl+j, k);
+			u->uP(2, i, u->j_gl-j, k) = -u->uP(2, i, u->j_cl+j, k); // we reflect so '-'
+
+			u->uP(4, i, u->j_gl-j, k) = u->uP(4, i, u->j_cl+j, k);
+			u->uP(4, i, u->j_gl-j, k) += u->uP(0, i, u->j_gl-j, k)*gy*(2*j+1)*u->dy; // += rho*g*(2j+1)dy
+		}
+	}
+	
+}
+
+void RTreflect_yout(Arrays *u) {
+	for(int k = u->k_dl; k <= u->k_dr; k++)
+	for(int i = u->i_dl; i <= u->i_dr; i++)
+	{
+		/* Loop through the ghost cells */
+		for (int j = 0; j < NGHOST; j++) {
+			u->uP(0, i, u->j_gr+j, k) = u->uP(0, i, u->j_cr-j, k);
+			u->uP(1, i, u->j_gr+j, k) = u->uP(1, i, u->j_cr-j, k); u->uP(3, i, u->j_gr+j, k) = u->uP(3, i, u->j_cr-j, k);
+			u->uP(2, i, u->j_gr+j, k) = -u->uP(2, i, u->j_cr-j, k); // we reflect so '-'
+
+			u->uP(4, i, u->j_gr+j, k) = u->uP(4, i, u->j_cr-j, k);
+			u->uP(4, i, u->j_gr+j, k) -= u->uP(0, i, u->j_gr+j, k)*gy*(2*j+1)*u->dy; // -= rho*g*(2j+1)dy
+		}
+	}
+}

@@ -33,6 +33,7 @@ bool bounds_zout(Arrays *u);
 
 
 bool allBounds(Arrays *u) {
+	ld gamma = u->gamma;
 
 	/* Call boundary functions if needed (N > 1) */
 	if (u->Nx > 1) {
@@ -47,6 +48,7 @@ bool allBounds(Arrays *u) {
 		if (!bounds_zin(u))  { cout << "primBounds::allBounds:: Could not set the boundaries for z_in !"  << endl; return false; }
 		if (!bounds_zout(u)) { cout << "primBounds::allBounds:: Could not set the boundaries for z_out !" << endl; return false; }
 	}
+	
 
 	/* For the whole grid (including ghost cells), compute the cell-centered magnetic fields (if MHD) and the conserved variables */
 	for(int k = u->k_dl; k <= u->k_dr; k++)
@@ -87,6 +89,7 @@ bool bounds_xin(Arrays *u) {
 				u->uC(6, i, j, k) = u->uC(6, u->Nx+i, j, k); u->uC(7, i, j, k) = u->uC(7, u->Nx+i, j, k);
 				u->uC(5, i, j, k) = u->uC(5, u->Nx+i, j, k);
 				if (isnan(u->uC(7, i, j, k))) cout << "bounds_xin: uC[7] is NaN !" << endl;
+				
 #endif // MHD
 
 			}
@@ -106,10 +109,12 @@ bool bounds_xin(Arrays *u) {
 
 				u->uP(1, i, j, k) = u->uP(1, u->i_cl, j, k); u->uP(2, i, j, k) = u->uP(2, u->i_cl, j, k); u->uP(3, i, j, k) = u->uP(3, u->i_cl, j, k);
 				u->uP(4, i, j, k) = u->uP(4, u->i_cl, j, k);
+
 #ifdef MHD
 				u->uC(6, i, j, k) = u->uC(6, u->i_cl, j, k); u->uC(7, i, j, k) = u->uC(7, u->i_cl, j, k);
 				u->uC(5, i, j, k) = u->uC(5, u->i_cl, j, k);
 				if (isnan(u->uC(7, i, j, k))) cout << "bounds_xin: uC[7] is NaN !" << endl;
+					
 #endif // MHD
 				
 			}
@@ -305,13 +310,15 @@ bool bounds_zin(Arrays *u) {
 		for(int i = u->i_dl; i <= u->i_dr; i++)
 		{
 			/* Loop through the ghost cells */
-			for (int k = 0; k < NGHOST; k++) {
+			for (int k = 0; k <= u->k_gl; k++) {
 				u->uP(0, i, j, k) = u->uP(0, i, j, u->Nz+k);
 				u->uP(1, i, j, k) = u->uP(1, i, j, u->Nz+k); u->uP(2, i, j, k) = u->uP(2, i, j, u->Nz+k); u->uP(3, i, j, k) = u->uP(3, i, j, u->Nz+k);
 				u->uP(4, i, j, k) = u->uP(4, i, j, u->Nz+k);
 #ifdef MHD
 				u->uC(5, i, j, k) = u->uC(5, i, j, u->Nz+k); u->uC(7, i, j, k) = u->uC(7, i, j, u->Nz+k);
 				u->uC(6, i, j, k) = u->uC(6, i, j, u->Nz+k);
+				/*u->uC(5, i, j, k) = u->uC(5, i, u->Ny+j, k); u->uC(7, i, j, k) = u->uC(7, i, u->Ny+j, k);
+				u->uC(6, i, j, k) = u->uC(6, i, u->Ny+j, k);*/
 #endif // MHD
 
 			}
@@ -325,13 +332,15 @@ bool bounds_zin(Arrays *u) {
 		for(int i = u->i_dl; i <= u->i_dr; i++)
 		{
 			/* Loop through the ghost cells */
-			for (int k = 0; k < NGHOST; k++) {
+			for (int k = 0; k <= u->k_gl; k++) {
 				u->uP(0, i, j, k) = u->uP(0, i, j, u->k_cl);
 				u->uP(1, i, j, k) = u->uP(1, i, j, u->k_cl); u->uP(2, i, j, k) = u->uP(2, i, j, u->k_cl); u->uP(3, i, j, k) = u->uP(3, i, j, u->k_cl);
 				u->uP(4, i, j, k) = u->uP(4, i, j, u->k_cl);
 #ifdef MHD
 				u->uC(5, i, j, k) = u->uC(5, i, j, u->k_cl); u->uC(7, i, j, k) = u->uC(7, i, j, u->k_cl);
 				u->uC(6, i, j, k) = u->uC(6, i, j, u->k_cl);
+				/*u->uC(5, i, j, k) = u->uC(5, i, u->j_cl, k); u->uC(7, i, j, k) = u->uC(7, i, u->j_cl, k);
+				u->uC(6, i, j, k) = u->uC(6, i, u->j_cl, k);*/
 #endif // MHD
 
 			}
@@ -360,11 +369,15 @@ bool bounds_zout(Arrays *u) {
 #ifdef MHD
 				u->uC(5, i, j, u->k_gr+k) = u->uC(5, i, j, u->k_cl+k); u->uC(7, i, j, u->k_gr+k) = u->uC(7, i, j, u->k_cl+k);
 				u->uC(6, i, j, u->k_gr+k) = u->uC(6, i, j, u->k_cl+k);
+				/*u->uC(5, i, u->j_gr+j, k) = u->uC(5, i, u->j_cl+j, k); u->uC(7, i, u->j_gr+j, k) = u->uC(7, i, u->j_cl+j, k);
+				u->uC(6, i, u->j_gr+j, k) = u->uC(6, i, u->j_cl+j, k);*/
+
 #endif // MHD
 
 			}
 #ifdef MHD
-			u->uC(6, i, j, u->k_dr+1) = u->uC(6, i, j, u->k_cl+u->k_cl);
+			u->uC(7, i, j, u->k_dr+1) = u->uC(7, i, j, u->k_cl+u->k_cl);
+			//u->uC(6, i, u->j_dr+1, k) = u->uC(6, i, u->j_cl+u->j_cl, k);
 #endif // MHD
 
 
@@ -386,11 +399,14 @@ bool bounds_zout(Arrays *u) {
 #ifdef MHD
 				u->uC(5, i, j, u->k_gr+k) = u->uC(5, i, j, u->k_cr); u->uC(7, i, j, u->k_gr+k) = u->uC(7, i, j, u->k_cr);
 				u->uC(6, i, j, u->k_gr+k) = u->uC(6, i, j, u->k_cr);
+				/*u->uC(5, i, u->j_gr+j, k) = u->uC(5, i, u->j_cr, k); u->uC(7, i, u->j_gr+j, k) = u->uC(7, i, u->j_cr, k);
+				u->uC(6, i, u->j_gr+j, k) = u->uC(6, i, u->j_cr, k);*/
 #endif // MHD
 
 			}
 #ifdef MHD
-			u->uC(6, i, j, u->k_dr+1) = u->uC(6, i, j, u->k_cr);
+			u->uC(7, i, j, u->k_dr+1) = u->uC(7, i, j, u->k_cr);
+			//u->uC(6, i, u->j_dr+1, k) = u->uC(6, i, u->j_cr, k);
 #endif // MHD
 
 
