@@ -34,6 +34,12 @@
     <Filter Include="Riemann">
       <UniqueIdentifier>{c3720993-26ec-4353-ac1d-e341edcd237f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Bounds">
+      <UniqueIdentifier>{0f7abc6d-4ac1-4274-b3dc-cc63a7a4b1b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Misc">
+      <UniqueIdentifier>{7b028242-2833-4dba-bebf-2587bf362a27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Asteria3d.cpp">
@@ -76,12 +82,6 @@
     </ClInclude>
     <ClInclude Include="old\Arrays.h">
       <Filter>old</Filter>
-    </ClInclude>
-    <ClInclude Include="primBounds.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="consBounds.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="prob.h">
       <Filter>Header Files</Filter>
@@ -131,9 +131,6 @@
     <ClInclude Include="Eq\CT.h">
       <Filter>Eq</Filter>
     </ClInclude>
-    <ClInclude Include="readParams.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="probs\shocktube.h">
       <Filter>Probs</Filter>
     </ClInclude>
@@ -148,6 +145,18 @@
     </ClInclude>
     <ClInclude Include="probs\blast.h">
       <Filter>Probs</Filter>
+    </ClInclude>
+    <ClInclude Include="probs\khinstability.h">
+      <Filter>Probs</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\readParams.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Bounds\consBounds.h">
+      <Filter>Bounds</Filter>
+    </ClInclude>
+    <ClInclude Include="Bounds\primBounds.h">
+      <Filter>Bounds</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

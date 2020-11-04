@@ -6,19 +6,19 @@ _Comments_
 
 _domain_
 
-<Nx> = <200>
-<Ny> = <600>
+<Nx> = <512>
+<Ny> = <512>
 <Nz> = <1>
-<x0> = <-0.25>
-<xn> = <0.25>
-<y0> = <-0.75>
-<yn> = <0.75>
+<x0> = <-0.5>
+<xn> = <0.5>
+<y0> = <-0.5>
+<yn> = <0.5>
 <z0> = <0.0>
 <zn> = <1.0>
 <BCxin> = <periodic>
 <BCxout> = <periodic>
-<BCyin> = <user>
-<BCyout> = <user>
+<BCyin> = <periodic>
+<BCyout> = <periodic>
 <BCzin> = <periodic>
 <BCzout> = <periodic>
 
@@ -26,7 +26,7 @@ _domain_
 _simulation_
 
 <t0> = <0.0>
-<tn> = <12.75>
+<tn> = <3.0>
 <CFL> = <0.3>
 
 
@@ -34,9 +34,12 @@ _problem_
 
 <gamma> = <1.4>
 
-<rhoUp> = <2.0>
-<rhoDown> = <1.0>
-<P0> = <0.7>
+<vIn> = <0.5>
+<vOut> = <-0.5>
+<rhoIn> = <2.0>
+<rhoOut> = <1.0>
+<P> = <2.5>
+<Bx> = <0.5>
 
 
 

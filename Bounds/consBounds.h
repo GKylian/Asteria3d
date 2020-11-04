@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Defs/Definitions.h"
+#include "../Defs/Definitions.h"
 
 /*
 <-------------------- Functions -------------------->

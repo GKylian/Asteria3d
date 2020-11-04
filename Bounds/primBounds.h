@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Defs/Arrays.h"
+#include "../Defs/Arrays.h"
 
 using namespace std;
 /*

@@ -6,7 +6,7 @@ import sys
 
 
 name = 'dens'
-nid = [0,5,10,15,21]
+nid = [1276]
 
 
 
@@ -52,6 +52,7 @@ def plot(i, var):
 
     print("Minimum:",np.min(data))
     print("Maximum:",np.max(data))
+    print("Average:",np.average(np.abs(data)))
     
     x1 = 0
     x2 = 0

@@ -6,9 +6,9 @@ _Comments_
 
 _domain_
 
-<Nx> = <1>
+<Nx> = <512>
 <Ny> = <1>
-<Nz> = <512>
+<Nz> = <1>
 <x0> = <-0.5>
 <xn> = <0.5>
 <y0> = <-0.5>
@@ -27,13 +27,13 @@ _simulation_
 
 <t0> = <0.0>
 <tn> = <0.1>
-<CFL> = <0.3>
+<CFL> = <0.1>
 
 
 _problem_
 
 <interface> = <0.0>
-<direction> = <2>
+<direction> = <0>
 <gamma> = <2.0>
 
 
@@ -42,30 +42,24 @@ _problem_
 <vyL> = <0.0>
 <vzL> = <0.0>
 <PL> = <1.0>
-<BxL> = <1.0> #0.75
-<ByL> = <0.0> #1.0
-<BzL> = <0.75>
+<BxL> = <0.75> #0.75
+<ByL> = <1.0> #1.0
+<BzL> = <0.0>
 
 <rhoR> = <0.125>
 <vxR> = <0.0>
 <vyR> = <0.0>
 <vzR> = <0.0>
 <PR> = <0.1>
-<BxR> = <-1.0> #0.75
-<ByR> = <0.0> #-1.0
-<BzR> = <0.75>
+<BxR> = <0.75> #0.75
+<ByR> = <-1.0> #-1.0
+<BzR> = <0.0>
 
 
 _out:0_
 <name> = <dens>
 <format> = <csv>
-<dt> = <0.01>
+<dt> = <0.0005>
 <ghosts> = <false>
 <var0> = <density>
 
-_out:1_
-<name> = <Div>
-<format> = <csv>
-<dt> = <0.01>
-<ghosts> = <false>
-<var0> = <BDiv>

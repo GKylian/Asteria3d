@@ -6,8 +6,8 @@ _Comments_
 
 _domain_
 
-<Nx> = <128>
-<Ny> = <128>
+<Nx> = <512>
+<Ny> = <512>
 <Nz> = <1>
 <x0> = <0.0>
 <xn> = <1.0>
@@ -26,7 +26,7 @@ _domain_
 _simulation_
 
 <t0> = <0.0>
-<tn> = <0.5>
+<tn> = <0.67>
 <CFL> = <0.3>
 
 
@@ -44,34 +44,13 @@ _problem_
 _out:0_
 <name> = <dens>
 <format> = <csv>
-<dt> = <0.01>
+<dt> = <0.0025>
 <ghosts> = <false>
 <var0> = <density>
 
 _out:1_
 <name> = <div>
 <format> = <csv>
-<dt> = <0.01>
+<dt> = <0.0025>
 <ghosts> = <false>
 <var0> = <BDiv>
-
-_out:2_
-<name> = <Bx>
-<format> = <csv>
-<dt> = <0.01>
-<ghosts> = <false>
-<var0> = <Bx>
-
-_out:3_
-<name> = <By>
-<format> = <csv>
-<dt> = <0.01>
-<ghosts> = <false>
-<var0> = <By>
-
-_out:4_
-<name> = <Bz>
-<format> = <csv>
-<dt> = <0.01>
-<ghosts> = <false>
-<var0> = <Bz>

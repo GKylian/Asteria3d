@@ -1,11 +1,12 @@
 #pragma once
 #include "Defs/Definitions.h"
-#include "readParams.h"
+#include "Misc/readParams.h"
 
 #include <string>
 #include <map>
 
 #include "Eq/AdiabMHD.h"
+#include "Bounds/primBounds.h"
 
 #define PNAME "loops"
 

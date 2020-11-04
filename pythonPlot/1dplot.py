@@ -6,11 +6,11 @@ import sys
 
 
 name = 'dens'
-nid = 11
+nid = 21
 
 
 
-N = pandas.read_csv("exports/"+name+"_0.csv", header=None, skiprows=None, nrows=1).to_numpy()
+N = pandas.read_csv("../exports/"+name+"_0.csv", header=None, skiprows=None, nrows=1).to_numpy()
 N = N[0]
 Nx = N[0]
 Ny = N[1]
@@ -22,7 +22,7 @@ print("Dimensions:",dim)
 if dim > 1:
     sys.exit("There is more than one dimension")
 
-d = pandas.read_csv("exports/"+name+"_0.csv", header=None, skiprows=1, nrows=1).to_numpy()
+d = pandas.read_csv("../exports/"+name+"_0.csv", header=None, skiprows=1, nrows=1).to_numpy()
 d = d[0]
 dx = d[0]
 dy = d[1]
@@ -31,7 +31,7 @@ dz = d[2]
 print(f"Resolution: {Nx} x {Ny} x {Nz}")
 print(f"Step sizes: {dx} & {dy} & {dz}")
 
-p0 = pandas.read_csv("exports/"+name+"_0.csv", header=None, skiprows=2, nrows=1).to_numpy()
+p0 = pandas.read_csv("../exports/"+name+"_0.csv", header=None, skiprows=2, nrows=1).to_numpy()
 p0 = p0[0]
 x0 = p0[0]
 y0 = p0[1]
@@ -45,7 +45,7 @@ print(f"Domain range:[{x0}; {xn}] x [{y0}; {yn}] x [{z0}; {zn}]")
 
 
 def plot(i, var):
-    path = "exports/"+var+"_"+str(i)+".csv"
+    path = "../exports/"+var+"_"+str(i)+".csv"
     data = pandas.read_csv(path, header=None, skiprows=3, nrows=1).to_numpy()
     data = data[0]
     print("Rendering data at ",path)
@@ -61,8 +61,10 @@ def plot(i, var):
     if Nz > 1:
         x = np.linspace(z0, zn, Nz)
 
+    #plt.xlim(0.1,0.3)
+    #plt.ylim(0.25,0.45)
     plt.plot(x, data)
     plt.show()
-    #plt.savefig("graphs/density_"+str(i)+".png", dpi=300)
+    #plt.savefig(var+".png", dpi=800)
 
 plot(nid, name)

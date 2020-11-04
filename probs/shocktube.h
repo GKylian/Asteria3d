@@ -1,6 +1,6 @@
 #pragma once
 #include "Defs/Definitions.h"
-#include "readParams.h"
+#include "Misc/readParams.h"
 
 #include <string>
 #include <map>
@@ -16,6 +16,7 @@
     #include "Eq/AdiabHD.h" 
   #endif // !ISO
 #endif // MHD
+#include "Bounds/primBounds.h"
 
 #define PNAME "shocktube"
 

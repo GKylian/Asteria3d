@@ -18,7 +18,7 @@
 #endif // MHD
 #include "Bounds/primBounds.h"
 
-#define PNAME "currentsheet"
+#define PNAME "khinstability"
 
 /*
 <->
@@ -70,7 +70,12 @@ ld Phii(Arrays *u, int i, int j, int k) {
 
 bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fname);
 bool DoInLoop(Arrays *u);
-bool check(Arrays *u);
+bool ApplyBounds(Arrays *u);
+
+void RTreflect_yin(Arrays *u);
+void RTreflect_yout(Arrays *u);
+
+
 
 
 bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fname) {
@@ -89,10 +94,12 @@ bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fna
 
 	u->gamma = stod((*params)["problem"]["gamma"]); ld gamma = u->gamma;
 
-	ld rho0 = stod((*params)["problem"]["rho0"]);
-	ld P0 = stod((*params)["problem"]["P0"]);
-	ld B0 = stod((*params)["problem"]["B0"]);
-	ld v0 = stod((*params)["problem"]["v0"]);
+	ld rhoIn = stod((*params)["problem"]["rhoIn"]);
+	ld rhoOut = stod((*params)["problem"]["rhoOut"]);
+	ld vIn = stod((*params)["problem"]["vIn"]);
+	ld vOut = stod((*params)["problem"]["vOut"]);
+	ld P = stod((*params)["problem"]["P"]);
+	ld Bx = stod((*params)["problem"]["Bx"]);
 	
 
 	/* Create the arrays */
@@ -114,28 +121,28 @@ bool Problem(Arrays *u, std::vector<Export> *out, map2d *params, std::string fna
 		/* Cell interface coordinates */
 		ld ix = x - 0.5*u->dx; ld iy = y - 0.5*u->dy; ld iz = z - 0.5*u->dz;
 
+
 		/* Set HD variables as primitive variables */
-		u->uP(0, i, j, k) = rho0; u->uP(4, i, j, k) = P0;
-		u->uP(1, i, j, k) = v0*sinl(2*M_PI*y); u->uP(2, i, j, k) = 0.0; u->uP(3, i, j, k) = 0.0;
-		
-		
+
+		u->uP(4, i, j, k) = P;
+		u->uP(1, i, j, k) = 0.02*(ld)rand()/RAND_MAX-0.01; u->uP(2, i, j, k) = 0.02*(ld)rand()/RAND_MAX-0.01; u->uP(3, i, j, k) = 0.0;
+
+		if (fabsl(y) > 0.25) {
+			u->uP(0, i, j, k) = rhoOut;
+			u->uP(1, i, j, k) += vOut;
+		}
+		else {
+			u->uP(0, i, j, k) = rhoIn;
+			u->uP(1, i, j, k) += vIn;
+		}
+
+
 
 #ifdef MHD
-		/* Compute potential at cell corners */
-
-
-		ld xc = u->x0 + u->dx*(i-NGHOST-0.5);// ld yc = u->y0 + u->dy*(j-NGHOST-0.5);
-		u->uC(5, i, j, k) = 0.0; u->uC(7, i, j, k) = 0.0;
-		if(xc >= 0.0 && xc < 0.5)
-			u->uC(6, i, j, k) = B0;
-		if (xc >= 0.5 && xc < 1.5)
-			u->uC(6, i, j, k) = -B0;
-		if (xc >= 1.5 && xc <= 2.0)
-			u->uC(6, i, j, k) = B0;
-
-
-
+		u->uC(5, i, j, k) = 0.5; u->uC(6, i, j, k) = 0.0; u->uC(7, i, j, k) = 0.0;
 #endif // MHD
+
+
 	}
 	cout << "problem():: Initialized the variables" << endl;
 
@@ -211,23 +218,9 @@ bool check(Arrays *u){
 		if(u->uP(4, i, j, k) <= 0) { std::cout << "check:: P at (" << i << ", " << j << ", " << k << ") is null or negative: " << u->uP(4, i, j, k) << std::endl; return false; }
 	}
 
-	//TODO: Remove this when I figured out what's causing the difference...
-	/* Check that the cell-centered average of B in uP is correct */
-	/*for(int k = u->k_cl; k <= u->k_cr; k++)
-	for(int j = u->j_cl; j <= u->j_cr; j++)
-	for(int i = u->i_cl; i <= u->i_cr; i++)
-	{
-		if (0.5*(u->uC(5, i, j, k)+u->uC(5, i+1, j, k)) != u->uP(5, i, j, k)) {
-			std::cout << "\tcheck:: The cell-centered value of Bx in uP is not correct: " << u->uP(5, i, j, k) << " but should be " << 0.5*(u->uC(5, i, j, k)+u->uC(5, i+1, j, k)) << std::endl;
-			return false;
-		}
-		if (0.5*(u->uC(6, i, j, k)+u->uC(6, i, j+1, k)) != u->uP(6, i, j, k)) {
-			std::cout << "\tcheck:: The cell-centered value of By in uP is not correct: " << u->uP(6, i, j, k) << " but should be " << 0.5*(u->uC(6, i, j, k)+u->uC(6, i, j+1, k)) << std::endl;
-			return false;
-		}
-	}*/
 	return true;
 }
+
 
 bool ApplyBounds(Arrays *u) {
 	if (u->Nx > 1 && u->boundaries[0] != bounds::USER) bounds_xin(u);
@@ -254,3 +247,11 @@ bool ApplyBounds(Arrays *u) {
 
 	return true;
 }
+
+
+
+
+
+
+/* ---------- Boundary functions (if any) ---------- */
+

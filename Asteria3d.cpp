@@ -15,9 +15,9 @@
 #include "Export/csv.h"
 
 #ifdef PRIMBOUNDS
-  #include "primBounds.h"
+  #include "Bounds/primBounds.h"
 #else
-  #include "consBounds.h"
+  #include "Bounds/consBounds.h"
 #endif // PRIMBOUNDS
 
 #include "Reconstruction/plm.h"

@@ -6,9 +6,9 @@ _Comments_
 
 _domain_
 
-<Nx> = <1>
+<Nx> = <256>
 <Ny> = <1>
-<Nz> = <512>
+<Nz> = <1>
 <x0> = <-0.5>
 <xn> = <0.5>
 <y0> = <-0.5>
@@ -33,7 +33,7 @@ _simulation_
 _problem_
 
 <interface> = <0.0>
-<direction> = <2>
+<direction> = <0>
 <gamma> = <1.4>
 
 
